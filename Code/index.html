@@ -9,10 +9,93 @@
       padding: 16px;
       font-family: sans-serif;
     }
+    #texto.empty::before {
+      content:attr(data-placeholder);
+      color: #999;
+      outline: none;
+      font-size: 16px;
+      color: #333;
+      min-height: 150px;
+    }
+    body{
+      position: relative;
+    }
+    #canvas{
+      position: absolute;
+      top: 40px;
+      left:0;
+      display: none;
+      cursor: crosshair;
+    }
+    body.desenhando #canvas{
+      display: block;
+    }
+    body.desenhando #texto{
+      pointer-events: none;
+    }
+    #btnDesenhar{
+      position: absolute;
+      top: 4px;
+      right: 4px;
+    }
   </style>
 </head>
 <body>
-  <h1>Nota</h1>
-  <p>1 nota.</p>
+  <button id="btnDesenhar">✏️</button>
+  <div contenteditable="true" id="texto" data-placeholder="Escreve a tua nota..." spellcheck="false">  </div>
+  <canvas id="canvas"></canvas>
 </body>
+  <script>
+      const texto = document.getElementById('texto');
+      function atualizarPlaceholder() {
+        if (texto.innerText.trim() === '') {
+          texto.classList.add('empty');
+        } else {
+          texto.classList.remove('empty');
+        }
+      }
+      texto.addEventListener('input', atualizarPlaceholder);
+      atualizarPlaceholder();
+
+      texto.innerText = window.notaAPI.carregar();
+      atualizarPlaceholder();
+
+      texto.addEventListener('input', () => {
+      atualizarPlaceholder();
+      window.notaAPI.guardar(texto.innerText);
+      });
+
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = 250;
+      canvas.height = 210;
+
+      const btnDesenhar = document.getElementById('btnDesenhar');
+      btnDesenhar.addEventListener('click', () => {
+        document.body.classList.toggle('desenhando');
+      });
+
+      let aDesenhar = false;
+
+      canvas.addEventListener('mousedown', (e) => {
+        aDesenhar = true;
+        ctx.beginPath();
+        ctx.moveTo(e.offsetX, e.offsetY);
+      });
+
+      canvas.addEventListener('mousemove', (e) => {
+        if (!aDesenhar) return;
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+      });
+
+      canvas.addEventListener('mouseup', () => {
+        aDesenhar = false;
+      });
+
+      canvas.addEventListener('mouseleave', () => {
+        aDesenhar = false;
+      });
+
+  </script>
 </html>
