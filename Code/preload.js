@@ -5,5 +5,7 @@ const Store = require('electron-store');
 const store = new Store(); 
 contextBridge.exposeInMainWorld('notaAPI', {
      guardar: (texto) => store.set('notaTexto', texto), 
-     carregar: () => store.get('notaTexto', '') 
+     carregar: () => store.get('notaTexto', ''), 
+     guardarDesenho: (dataUrl) => store.set('notaDesenho', dataUrl),
+     carregarDesenho: () => store.get('notaDesenho', null)
     });

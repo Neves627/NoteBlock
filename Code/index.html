@@ -58,6 +58,14 @@
       atualizarPlaceholder();
 
       texto.innerText = window.notaAPI.carregar();
+      const desenhoGuardado = window.notaAPI.carregarDesenho();
+      if (desenhoGuardado) {
+        const img = new Image();
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0);
+        };
+        img.src = desenhoGuardado;
+      }
       atualizarPlaceholder();
 
       texto.addEventListener('input', () => {
@@ -91,6 +99,7 @@
 
       canvas.addEventListener('mouseup', () => {
         aDesenhar = false;
+        window.notaAPI.guardarDesenho(canvas.toDataURL());
       });
 
       canvas.addEventListener('mouseleave', () => {
