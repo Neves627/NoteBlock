@@ -9,6 +9,10 @@
       padding: 16px;
       font-family: sans-serif;
     }
+    #texto {
+    margin-top: 20px; 
+    outline: none;
+    }
     #texto.empty::before {
       content:attr(data-placeholder);
       color: #999;
@@ -23,6 +27,7 @@
     #canvas{
       position: absolute;
       top: 40px;
+      width: 100%;
       left:0;
       display: block;
       pointer-events: none;
@@ -39,6 +44,15 @@
       top: 4px;
       right: 4px;
     }
+    #btnFechar {
+      position: absolute;
+      top: 4px;
+      left: 4px; 
+      z-index: 10;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+    }
     #btnDesenhar, #btnBorracha, #btnLimpar {
     position: absolute;
     top: 4px;
@@ -51,6 +65,7 @@
 </head>
 <body>
   <div class="toolbar">
+    <button id="btnFechar" title="Fechar">❌</button>
   <button id="btnDesenhar">✏️</button>
   <button id="btnBorracha" title="Borracha">🧹</button>
   <button id="btnLimpar" title="Limpar tudo">🗑️</button>
@@ -59,6 +74,7 @@
   <canvas id="canvas"></canvas>
 </body>
   <script>
+      //Placeholder and text save
       const texto = document.getElementById('texto');
       function atualizarPlaceholder() {
         if (texto.innerText.trim() === '') {
@@ -86,11 +102,14 @@
       window.notaAPI.guardar(texto.innerText);
       });
 
+
+      //canvas drawing
       const canvas = document.getElementById('canvas');
       const ctx = canvas.getContext('2d');
       canvas.width = 250;
       canvas.height = 210;
 
+      const btnDesenhar = document.getElementById('btnDesenhar');
       btnDesenhar.addEventListener('click', () => {
       modoBorracha = false;
       ctx.globalCompositeOperation = 'source-over'; 
@@ -102,20 +121,26 @@
       let aDesenhar = false;
 
       let modoBorracha = false;
+      
 
+      // Event listeners for the eraser and clear buttons
       const btnBorracha = document.getElementById('btnBorracha');
       btnBorracha.addEventListener('click', () => {
       document.body.classList.add('desenhando');
       modoBorracha = true;
-      ctx.globalCompositeOperation = 'destination-out'; // "Apaga" tornando os píxeis transparentes
-      ctx.lineWidth = 12; // Espessura da borracha
+      ctx.globalCompositeOperation = 'destination-out'; 
+      ctx.lineWidth = 12; 
       });
 
-      // Botão Limpar Tudo: Limpa o canvas e atualiza o armazenamento
       const btnLimpar = document.getElementById('btnLimpar');
       btnLimpar.addEventListener('click', () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       window.notaAPI.guardarDesenho(canvas.toDataURL());
+      });
+
+      const btnFechar = document.getElementById('btnFechar');
+      btnFechar.addEventListener('click', () => {
+      window.notaAPI.fecharJanela();
       });
 
       canvas.addEventListener('mousedown', (e) => {
@@ -138,6 +163,33 @@
       canvas.addEventListener('mouseleave', () => {
         aDesenhar = false;
       });
+
+      function redimensionarCanvas() {
+      const desenhoAtual = canvas.toDataURL();
+
+      // Canvas size adjustment
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight - 40;
+
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0);
+      };
+      img.src = desenhoAtual;
+    }
+    
+    redimensionarCanvas();
+
+    window.addEventListener('resize', () => {
+      redimensionarCanvas();
+    });
+
+    window.addEventListener('resize', () => {
+    redimensionarCanvas();
+  
+      
+    window.notaAPI.guardarTamanho(window.innerWidth, window.innerHeight);
+    });
 
   </script>
 </html>

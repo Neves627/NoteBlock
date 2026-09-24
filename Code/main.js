@@ -1,4 +1,4 @@
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, ipcMain} = require('electron');
 const Store = require('electron-store');
 
 
@@ -6,17 +6,23 @@ const store = new Store();
 
 function createWindow() {
     const path = require('path'); 
+
+    const tamanhoGuardado = store.get('tamanhoJanela', { largura: 250, altura: 250 });
     const win = new BrowserWindow({
-        width: 250,
-        height: 250,
+        width: tamanhoGuardado.largura,
+        height: tamanhoGuardado.altura,
         frame: false,
         alwaysOnTop: true,
         resizable: true,
         webPreferences: { preload: path.join(__dirname, 'preload.js'), sandbox: false } });
 
     win.loadFile('index.html');
-
 }
+
+ipcMain.on('fechar-janela', (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (win) win.close();
+});
 
 app.whenReady().then(() => {
     createWindow();
