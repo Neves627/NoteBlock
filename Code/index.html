@@ -53,11 +53,20 @@
       border: none;
       cursor: pointer;
     }
+    .toolbar{ 
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 32px;
+      -webkit-app-region: drag;
+     }
     #btnDesenhar, #btnBorracha, #btnLimpar {
     position: absolute;
     top: 4px;
     z-index: 10;
     }
+    .toolbar button{ -webkit-app-region: no-drag; }
     #btnDesenhar { right: 76px; }
     #btnBorracha { right: 40px; }
     #btnLimpar { right: 4px; }
