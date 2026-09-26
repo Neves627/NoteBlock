@@ -53,6 +53,10 @@
       border: none;
       cursor: pointer;
     }
+    #btnAlarme { 
+      top: 4px;
+      right: 113px; 
+    }
     .toolbar{ 
       position: absolute;
       top: 0;
@@ -61,7 +65,7 @@
       height: 32px;
       -webkit-app-region: drag;
      }
-    #btnDesenhar, #btnBorracha, #btnLimpar {
+    #btnDesenhar, #btnBorracha, #btnLimpar, #btnAlarme {
     position: absolute;
     top: 4px;
     z-index: 10;
@@ -70,6 +74,32 @@
     #btnDesenhar { right: 76px; }
     #btnBorracha { right: 40px; }
     #btnLimpar { right: 4px; }
+
+    #texto img {
+    resize: both;
+    overflow: hidden;
+    display: inline-block;
+  }
+  .imagem-wrapper {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+  }
+  .imagem-wrapper img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .resize-handle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    right: -2px;
+    bottom: -2px;
+    background: #333;
+    border-radius: 2px;
+    cursor: nwse-resize;
+  }
   </style>
 </head>
 <body>
@@ -78,6 +108,7 @@
   <button id="btnDesenhar">✏️</button>
   <button id="btnBorracha" title="Borracha">🧹</button>
   <button id="btnLimpar" title="Limpar tudo">🗑️</button>
+  <button id="btnAlarme" title="Alarme">⏰</button>
   </div>
   <div contenteditable="true" id="texto" data-placeholder="Escreve a tua nota..." spellcheck="false">  </div>
   <canvas id="canvas"></canvas>
@@ -86,7 +117,7 @@
       //Placeholder and text save
       const texto = document.getElementById('texto');
       function atualizarPlaceholder() {
-        if (texto.innerText.trim() === '') {
+        if (texto.innerHTML.trim() === '') {
           texto.classList.add('empty');
         } else {
           texto.classList.remove('empty');
@@ -95,7 +126,13 @@
       texto.addEventListener('input', atualizarPlaceholder);
       atualizarPlaceholder();
 
-      texto.innerText = window.notaAPI.carregar();
+      texto.innerHTML = window.notaAPI.carregar();
+
+      texto.querySelectorAll('.imagem-wrapper').forEach((wrapper) => {
+      const handle = wrapper.querySelector('.resize-handle');
+      if (handle) ativarResize(wrapper, handle);
+    });
+
       const desenhoGuardado = window.notaAPI.carregarDesenho();
       if (desenhoGuardado) {
         const img = new Image();
@@ -108,7 +145,7 @@
 
       texto.addEventListener('input', () => {
       atualizarPlaceholder();
-      window.notaAPI.guardar(texto.innerText);
+      window.notaAPI.guardar(texto.innerHTML);
       });
 
 
@@ -200,5 +237,74 @@
     window.notaAPI.guardarTamanho(window.innerWidth, window.innerHeight);
     });
 
+    //copy paste functionality
+    texto.addEventListener('paste', (e) => {
+    const items = e.clipboardData.items;
+    for (const item of items) {
+      if (item.type.indexOf('image') === 0) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        const reader = new FileReader();
+        reader.onload = (evento) => {
+          inserirImagemRedimensionavel(evento.target.result);
+        };
+        reader.readAsDataURL(file);
+        return;
+      }
+    }
+  });
+    function inserirImagemRedimensionavel(src) {
+    const wrapper = document.createElement('span');
+    wrapper.className = 'imagem-wrapper';
+    wrapper.contentEditable = false;
+    wrapper.style.width = '150px';
+    wrapper.style.height = '150px';
+
+    const img = document.createElement('img');
+    img.src = src;
+
+    const handle = document.createElement('span');
+    handle.className = 'resize-handle';
+
+    wrapper.appendChild(img);
+    wrapper.appendChild(handle);
+
+    const sel = window.getSelection();
+    if (sel.rangeCount > 0) {
+      sel.getRangeAt(0).insertNode(wrapper);
+    } else {
+      texto.appendChild(wrapper);
+    }
+
+    ativarResize(wrapper, handle);
+    window.notaAPI.guardar(texto.innerHTML);
+  }
+
+  function ativarResize(wrapper, handle) {
+    handle.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const startWidth = wrapper.offsetWidth;
+      const startHeight = wrapper.offsetHeight;
+
+      function mover(e2) {
+        const novaLargura = startWidth + (e2.clientX - startX);
+        const novaAltura = startHeight + (e2.clientY - startY);
+        wrapper.style.width = Math.max(30, novaLargura) + 'px';
+        wrapper.style.height = Math.max(30, novaAltura) + 'px';
+      }
+
+      function soltar() {
+        document.removeEventListener('mousemove', mover);
+        document.removeEventListener('mouseup', soltar);
+        window.notaAPI.guardar(texto.innerHTML);
+      }
+
+      document.addEventListener('mousemove', mover);
+      document.addEventListener('mouseup', soltar);
+    });
+  }
   </script>
 </html>
