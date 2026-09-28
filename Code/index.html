@@ -112,6 +112,21 @@
   </div>
   <div contenteditable="true" id="texto" data-placeholder="Escreve a tua nota..." spellcheck="false">  </div>
   <canvas id="canvas"></canvas>
+  <div id="painelAlarme" style="display:none;">
+  <input type="date" id="alarmeData">
+  <input type="time" id="alarmeHora" value="09:00">
+  <div id="diasSemana">
+    <button data-dia="0">D</button>
+    <button data-dia="1">S</button>
+    <button data-dia="2">T</button>
+    <button data-dia="3">Q</button>
+    <button data-dia="4">Q</button>
+    <button data-dia="5">S</button>
+    <button data-dia="6">S</button>
+    </div>
+    <button id="btnGuardarAlarme">Guardar</button>
+    <button id="btnRemoverAlarme">Remover</button>
+  </div>
 </body>
   <script>
       //Placeholder and text save
@@ -306,5 +321,30 @@
       document.addEventListener('mouseup', soltar);
     });
   }
+
+  // Alarme functionality
+  const btnAlarme = document.getElementById('btnAlarme');
+  const painelAlarme = document.getElementById('painelAlarme');
+  const alarmeData = document.getElementById('alarmeData');
+  const alarmeHora = document.getElementById('alarmeHora'); 
+  const diasSemana = document.getElementById('diasSemana');
+  let diasSelecionados = [];
+  btnAlarme.addEventListener('click', () =>
+   { painelAlarme.style.display = painelAlarme.style.display === 'none' ? 'flex' : 'none'; 
+   });
+
+   diasSemana.querySelectorAll('button').forEach((btn) => 
+   { btn.addEventListener('click', () => { const dia = parseInt(btn.dataset.dia, 10
+   );
+   if (diasSelecionados.includes(dia)) { diasSelecionados = diasSelecionados.filter((d) => d !== dia);
+   btn.classList.remove('ativo'); } else { diasSelecionados.push(dia); btn.classList.add('ativo'); } }); });
+
+   const btnGuardarAlarme = document.getElementById('btnGuardarAlarme');
+   btnGuardarAlarme.addEventListener('click', () => 
+   { const alarme = { hora: alarmeHora.value, dias: diasSelecionados.length ? diasSelecionados : null, data: diasSelecionados.length ? null : alarmeData.value };
+   window.notaAPI.guardarAlarme(alarme); painelAlarme.style.display = 'none'; });
+
+   const btnRemoverAlarme = document.getElementById('btnRemoverAlarme');
+   btnRemoverAlarme.addEventListener('click', () => { window.notaAPI.guardarAlarme(null); painelAlarme.style.display = 'none'; });
   </script>
 </html>

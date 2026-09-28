@@ -17,6 +17,7 @@ function createWindow() {
         webPreferences: { preload: path.join(__dirname, 'preload.js'), sandbox: false } });
 
     win.loadFile('index.html');
+    //win.webContents.openDevTools();
 }
 
 ipcMain.on('fechar-janela', (event) => {

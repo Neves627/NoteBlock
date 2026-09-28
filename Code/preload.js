@@ -11,4 +11,6 @@ contextBridge.exposeInMainWorld('notaAPI', {
      guardarTamanho: (largura, altura) => store.set('tamanhoJanela', { largura, altura }),
      carregarTamanho: () => store.get('tamanhoJanela', { largura: 250, altura: 250 }),
      fecharJanela: () => ipcRenderer.send('fechar-janela'),
+     guardarAlarme: (alarme) => store.set('notaAlarme', alarme),
+     carregarAlarme: () => store.get('notaAlarme', null),
     });
