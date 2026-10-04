@@ -2,258 +2,386 @@
 <html>
 <head>
   <title>Nota</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
   <style>
     body {
       background-color: #fff2ba;
       margin: 0;
       padding: 16px;
       font-family: sans-serif;
-    }
-    #texto {
-    margin-top: 20px; 
-    outline: none;
-    }
-    #texto.empty::before {
-      content:attr(data-placeholder);
-      color: #999;
-      outline: none;
-      font-size: 16px;
-      color: #333;
-      min-height: 150px;
-    }
-    body{
       position: relative;
     }
-    #canvas{
+    #texto {
+      margin-top: 20px;
+      outline: none;
+      position: relative;
+    }
+    #texto.empty::before {
+      content: attr(data-placeholder);
+      color: #999;
+    }
+
+    /* Canvas de desenho */
+    #canvas {
       position: absolute;
       top: 40px;
       width: 100%;
-      left:0;
+      left: 0;
       display: block;
       pointer-events: none;
     }
-    body.desenhando #canvas{
+    body.desenhando #canvas {
       pointer-events: auto;
       cursor: crosshair;
     }
-    body.desenhando #texto{
+    body.desenhando #texto {
       pointer-events: none;
     }
-    #btnDesenhar{
-      position: absolute;
-      top: 4px;
-      right: 4px;
-    }
-    #btnFechar {
-      position: absolute;
-      top: 4px;
-      left: 4px; 
-      z-index: 10;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-    }
-    #btnAlarme { 
-      top: 4px;
-      right: 113px; 
-    }
-    .toolbar{ 
+
+    /* Toolbar */
+    .toolbar {
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       height: 32px;
       -webkit-app-region: drag;
-     }
-    #btnDesenhar, #btnBorracha, #btnLimpar, #btnAlarme {
-    position: absolute;
-    top: 4px;
-    z-index: 10;
     }
-    .toolbar button{ -webkit-app-region: no-drag; }
+    .toolbar button {
+      -webkit-app-region: no-drag;
+    }
+    #btnFechar {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      z-index: 10;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+    }
+    #btnDesenhar, #btnBorracha, #btnLimpar, #btnAlarme {
+      position: absolute;
+      top: 4px;
+      z-index: 10;
+    }
     #btnDesenhar { right: 76px; }
     #btnBorracha { right: 40px; }
     #btnLimpar { right: 4px; }
+    #btnAlarme { right: 112px; }
 
-    #texto img {
-    resize: both;
-    overflow: hidden;
-    display: inline-block;
+    /* Imagens arrastáveis/redimensionáveis (interact.js) */
+    .imagem-wrapper {
+      position: absolute;
+      display: inline-block;
+      cursor: move;
+    }
+    .imagem-wrapper img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    /* Painel de alarmes */
+    .painel-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .painel-conteudo {
+    background: #fffbe8;
+    border-radius: 8px;
+    padding: 14px;
+    width: 95%;
+    min-height: 80%;
+    max-height: 92%;
+    overflow-y: auto;
+    font-size: 13px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   }
-  .imagem-wrapper {
-    position: relative;
-    display: inline-block;
-    max-width: 100%;
-  }
-  .imagem-wrapper img {
-    display: block;
-    width: 100%;
+    html, body {
     height: 100%;
+    }
+    .painel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .painel-header button {
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    #listaAlarmes {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .item-alarme {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+      padding: 6px 8px;
+    }
+    .item-alarme button {
+      border: none;
+      background: #f0a0a0;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+      padding: 2px 6px;
+    }
+    .novo-alarme {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      padding-top: 8px;
+    }
+    #diasSemana {
+      display: flex;
+      gap: 3px;
+    }
+    #diasSemana button {
+      flex: 1;
+      padding: 4px 0;
+      font-size: 10px;
+    }
+    #diasSemana button.ativo {
+      background: #d99a2b;
+      color: white;
+    }
+    css .btn-apagar-imagem { 
+     position: absolute;
+     top: -8px; left: -8px; 
+     width: 18px; 
+     height: 18px; 
+     background: #d64545; 
+     color: white; 
+     border: none; 
+     border-radius: 50%;
+     font-size: 11px;
+     line-height: 18px;
+     text-align: center;
+     cursor: pointer;
+     padding: 0; 
+    }
+    @keyframes alarmeAnimacao {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(217, 154, 43, 0); }
+    50% { box-shadow: 0 0 0 6px rgba(217, 154, 43, 0.6); }
   }
-  .resize-handle {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    right: -2px;
-    bottom: -2px;
-    background: #333;
-    border-radius: 2px;
-    cursor: nwse-resize;
-  }
+body.a-tocar {
+  animation: alarmeAnimacao 0.6s ease-in-out 4;
+}
   </style>
 </head>
 <body>
   <div class="toolbar">
     <button id="btnFechar" title="Fechar">❌</button>
-  <button id="btnDesenhar">✏️</button>
-  <button id="btnBorracha" title="Borracha">🧹</button>
-  <button id="btnLimpar" title="Limpar tudo">🗑️</button>
-  <button id="btnAlarme" title="Alarme">⏰</button>
+    <button id="btnDesenhar" title="Desenhar">✏️</button>
+    <button id="btnBorracha" title="Borracha">🧹</button>
+    <button id="btnLimpar" title="Limpar tudo">🗑️</button>
+    <button id="btnAlarme" title="Alarme">⏰</button>
   </div>
-  <div contenteditable="true" id="texto" data-placeholder="Escreve a tua nota..." spellcheck="false">  </div>
+
+  <div contenteditable="true" id="texto" data-placeholder="Escreve a tua nota..." spellcheck="false"></div>
   <canvas id="canvas"></canvas>
-  <div id="painelAlarme" style="display:none;">
-  <input type="date" id="alarmeData">
-  <input type="time" id="alarmeHora" value="09:00">
-  <div id="diasSemana">
-    <button data-dia="0">D</button>
-    <button data-dia="1">S</button>
-    <button data-dia="2">T</button>
-    <button data-dia="3">Q</button>
-    <button data-dia="4">Q</button>
-    <button data-dia="5">S</button>
-    <button data-dia="6">S</button>
+
+  <div id="painelAlarme" class="painel-overlay" style="display:none;">
+    <div class="painel-conteudo">
+      <div class="painel-header">
+        <span>Alarmes</span>
+        <button id="btnFecharPainel">✕</button>
+      </div>
+      <div id="listaAlarmes"></div>
+      <div class="novo-alarme">
+        <input type="date" id="alarmeData">
+        <input type="time" id="alarmeHora" value="09:00">
+        <div id="diasSemana">
+          <button data-dia="0">D</button>
+          <button data-dia="1">S</button>
+          <button data-dia="2">T</button>
+          <button data-dia="3">Q</button>
+          <button data-dia="4">Q</button>
+          <button data-dia="5">S</button>
+          <button data-dia="6">S</button>
+        </div>
+        <button id="btnGuardarAlarme">Adicionar alarme</button>
+      </div>
     </div>
-    <button id="btnGuardarAlarme">Guardar</button>
-    <button id="btnRemoverAlarme">Remover</button>
   </div>
-</body>
+
   <script>
-      //Placeholder and text save
-      const texto = document.getElementById('texto');
-      function atualizarPlaceholder() {
-        if (texto.innerHTML.trim() === '') {
-          texto.classList.add('empty');
-        } else {
-          texto.classList.remove('empty');
-        }
+    // ============================================
+    // REFERÊNCIAS PRINCIPAIS
+    // ============================================
+    const texto = document.getElementById('texto');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // ============================================
+    // PLACEHOLDER
+    // ============================================
+    function atualizarPlaceholder() {
+      if (texto.innerHTML.trim() === '') {
+        texto.classList.add('empty');
+      } else {
+        texto.classList.remove('empty');
       }
-      texto.addEventListener('input', atualizarPlaceholder);
-      atualizarPlaceholder();
+    }
 
-      texto.innerHTML = window.notaAPI.carregar();
+    // ============================================
+    // TEXTO — carregar, guardar, placeholder
+    // ============================================
+    texto.innerHTML = window.notaAPI.carregar();
+    atualizarPlaceholder();
 
-      texto.querySelectorAll('.imagem-wrapper').forEach((wrapper) => {
-      const handle = wrapper.querySelector('.resize-handle');
-      if (handle) ativarResize(wrapper, handle);
-    });
-
-      const desenhoGuardado = window.notaAPI.carregarDesenho();
-      if (desenhoGuardado) {
-        const img = new Image();
-        img.onload = () => {
-          ctx.drawImage(img, 0, 0);
-        };
-        img.src = desenhoGuardado;
-      }
-      atualizarPlaceholder();
-
-      texto.addEventListener('input', () => {
+    texto.addEventListener('input', () => {
       atualizarPlaceholder();
       window.notaAPI.guardar(texto.innerHTML);
-      });
+    });
 
-
-      //canvas drawing
-      const canvas = document.getElementById('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = 250;
-      canvas.height = 210;
-
-      const btnDesenhar = document.getElementById('btnDesenhar');
-      btnDesenhar.addEventListener('click', () => {
-      modoBorracha = false;
-      ctx.globalCompositeOperation = 'source-over'; 
-      ctx.strokeStyle = '#000000'; 
-      ctx.lineWidth = 2;
-      document.body.classList.toggle('desenhando');
-      });
-
-      let aDesenhar = false;
-
-      let modoBorracha = false;
-      
-
-      // Event listeners for the eraser and clear buttons
-      const btnBorracha = document.getElementById('btnBorracha');
-      btnBorracha.addEventListener('click', () => {
-      document.body.classList.add('desenhando');
-      modoBorracha = true;
-      ctx.globalCompositeOperation = 'destination-out'; 
-      ctx.lineWidth = 12; 
-      });
-
-      const btnLimpar = document.getElementById('btnLimpar');
-      btnLimpar.addEventListener('click', () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      window.notaAPI.guardarDesenho(canvas.toDataURL());
-      });
-
-      const btnFechar = document.getElementById('btnFechar');
-      btnFechar.addEventListener('click', () => {
-      window.notaAPI.fecharJanela();
-      });
-
-      canvas.addEventListener('mousedown', (e) => {
-        aDesenhar = true;
-        ctx.beginPath();
-        ctx.moveTo(e.offsetX, e.offsetY);
-      });
-
-      canvas.addEventListener('mousemove', (e) => {
-        if (!aDesenhar) return;
-        ctx.lineTo(e.offsetX, e.offsetY);
-        ctx.stroke();
-      });
-
-      canvas.addEventListener('mouseup', () => {
-        aDesenhar = false;
-        window.notaAPI.guardarDesenho(canvas.toDataURL());
-      });
-
-      canvas.addEventListener('mouseleave', () => {
-        aDesenhar = false;
-      });
-
-      function redimensionarCanvas() {
-      const desenhoAtual = canvas.toDataURL();
-
-      // Canvas size adjustment
+    // ============================================
+    // CANVAS — tamanho inicial e carregar desenho
+    // ============================================
+    function ajustarTamanhoCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight - 40;
-
-      const img = new Image();
-      img.onload = () => {
-        ctx.drawImage(img, 0, 0);
-      };
-      img.src = desenhoAtual;
     }
-    
-    redimensionarCanvas();
+    ajustarTamanhoCanvas();
+
+    const desenhoGuardado = window.notaAPI.carregarDesenho();
+    if (desenhoGuardado) {
+      const imgDesenho = new Image();
+      imgDesenho.onload = () => {
+        ctx.drawImage(imgDesenho, 0, 0);
+      };
+      imgDesenho.src = desenhoGuardado;
+    }
+
+    // ============================================
+    // BOTÕES DA TOOLBAR
+    // ============================================
+    let aDesenhar = false;
+    let modoBorracha = false;
+
+    const btnDesenhar = document.getElementById('btnDesenhar');
+    btnDesenhar.addEventListener('click', () => {
+      modoBorracha = false;
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 2;
+      document.body.classList.toggle('desenhando');
+    });
+
+    const btnBorracha = document.getElementById('btnBorracha');
+    btnBorracha.addEventListener('click', () => {
+      document.body.classList.add('desenhando');
+      modoBorracha = true;
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.lineWidth = 12;
+    });
+
+    const btnLimpar = document.getElementById('btnLimpar');
+    btnLimpar.addEventListener('click', () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      window.notaAPI.guardarDesenho(canvas.toDataURL());
+    });
+
+    const btnFechar = document.getElementById('btnFechar');
+    btnFechar.addEventListener('click', () => {
+      window.notaAPI.fecharJanela();
+    });
+
+    // ============================================
+    // DESENHAR COM O RATO
+    // ============================================
+    canvas.addEventListener('mousedown', (e) => {
+      aDesenhar = true;
+      ctx.beginPath();
+      ctx.moveTo(e.offsetX, e.offsetY);
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (!aDesenhar) return;
+      ctx.lineTo(e.offsetX, e.offsetY);
+      ctx.stroke();
+    });
+
+    canvas.addEventListener('mouseup', () => {
+      aDesenhar = false;
+      window.notaAPI.guardarDesenho(canvas.toDataURL());
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+      aDesenhar = false;
+    });
+
+    // ============================================
+    // REDIMENSIONAR JANELA (só quando o utilizador redimensiona)
+    // ============================================
+    function redimensionarCanvas() {
+      const desenhoAtual = canvas.toDataURL();
+      ajustarTamanhoCanvas();
+      const imgResize = new Image();
+      imgResize.onload = () => {
+        ctx.drawImage(imgResize, 0, 0);
+      };
+      imgResize.src = desenhoAtual;
+    }
 
     window.addEventListener('resize', () => {
       redimensionarCanvas();
+      window.notaAPI.guardarTamanho(window.innerWidth, window.innerHeight);
     });
 
-    window.addEventListener('resize', () => {
-    redimensionarCanvas();
-  
-      
-    window.notaAPI.guardarTamanho(window.innerWidth, window.innerHeight);
+    // ============================================
+    // COLAR IMAGENS
+    // ============================================
+    function inserirImagemRedimensionavel(src) {
+    const wrapper = document.createElement('span');
+    wrapper.className = 'imagem-wrapper';
+    wrapper.contentEditable = false;
+    wrapper.style.width = '150px';
+    wrapper.style.height = '150px';
+    wrapper.style.left = '10px';
+    wrapper.style.top = '10px';
+
+    const img = document.createElement('img');
+    img.src = src;
+
+    const btnApagar = document.createElement('button');
+    btnApagar.className = 'btn-apagar-imagem';
+    btnApagar.textContent = '✕';
+    btnApagar.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+    });
+    btnApagar.addEventListener('click', () => {
+      wrapper.remove();
+      window.notaAPI.guardar(texto.innerHTML);
     });
 
-    //copy paste functionality
-    texto.addEventListener('paste', (e) => {
+    wrapper.appendChild(img);
+    wrapper.appendChild(btnApagar);
+    texto.appendChild(wrapper);
+
+    window.notaAPI.guardar(texto.innerHTML);
+  }
+
+  texto.addEventListener('paste', (e) => {
     const items = e.clipboardData.items;
     for (const item of items) {
       if (item.type.indexOf('image') === 0) {
@@ -268,83 +396,196 @@
       }
     }
   });
-    function inserirImagemRedimensionavel(src) {
-    const wrapper = document.createElement('span');
-    wrapper.className = 'imagem-wrapper';
-    wrapper.contentEditable = false;
-    wrapper.style.width = '150px';
-    wrapper.style.height = '150px';
 
-    const img = document.createElement('img');
-    img.src = src;
+    // ============================================
+    // INTERACT.JS — arrastar e redimensionar imagens
+    // ============================================
+    interact('.imagem-wrapper')
+      .draggable({
+        listeners: {
+          ignoreFrom: '.btn-apagar-imagem',
+          move(event) {
+            const target = event.target;
+            const left = (parseFloat(target.style.left) || 0) + event.dx;
+            const top = (parseFloat(target.style.top) || 0) + event.dy;
+            target.style.left = left + 'px';
+            target.style.top = top + 'px';
+          },
+          end() {
+            window.notaAPI.guardar(texto.innerHTML);
+          }
+        }
+      })
+      .resizable({
+        edges: { left: false, top: false, right: true, bottom: true },
+        margin: 8,
+        listeners: {
+          move(event) {
+            Object.assign(event.target.style, {
+              width: `${event.rect.width}px`,
+              height: `${event.rect.height}px`
+            });
+          },
+          end() {
+            window.notaAPI.guardar(texto.innerHTML);
+          }
+        }
+      });
 
-    const handle = document.createElement('span');
-    handle.className = 'resize-handle';
+    // ============================================
+    // ALARMES
+    // ============================================
+    const btnAlarme = document.getElementById('btnAlarme');
+    const painelAlarme = document.getElementById('painelAlarme');
+    const btnFecharPainel = document.getElementById('btnFecharPainel');
+    const listaAlarmes = document.getElementById('listaAlarmes');
+    const alarmeData = document.getElementById('alarmeData');
+    const alarmeHora = document.getElementById('alarmeHora');
+    const diasSemana = document.getElementById('diasSemana');
+    const btnGuardarAlarme = document.getElementById('btnGuardarAlarme');
+    const NOMES_DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
 
-    wrapper.appendChild(img);
-    wrapper.appendChild(handle);
+    let alarmes = window.notaAPI.carregarAlarmes();
+    let diasSelecionados = [];
 
-    const sel = window.getSelection();
-    if (sel.rangeCount > 0) {
-      sel.getRangeAt(0).insertNode(wrapper);
-    } else {
-      texto.appendChild(wrapper);
+    function formatarAlarme(alarme) {
+      if (alarme.dias && alarme.dias.length) {
+        const nomes = alarme.dias.map((d) => NOMES_DIAS[d]).join(', ');
+        return `${nomes} às ${alarme.hora}`;
+      }
+      if (alarme.data) {
+        const d = new Date(alarme.data + 'T' + alarme.hora);
+        return d.toLocaleDateString('pt-PT') + ' às ' + alarme.hora;
+      }
+      return alarme.hora;
     }
 
-    ativarResize(wrapper, handle);
-    window.notaAPI.guardar(texto.innerHTML);
-  }
-
-  function ativarResize(wrapper, handle) {
-    handle.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const startX = e.clientX;
-      const startY = e.clientY;
-      const startWidth = wrapper.offsetWidth;
-      const startHeight = wrapper.offsetHeight;
-
-      function mover(e2) {
-        const novaLargura = startWidth + (e2.clientX - startX);
-        const novaAltura = startHeight + (e2.clientY - startY);
-        wrapper.style.width = Math.max(30, novaLargura) + 'px';
-        wrapper.style.height = Math.max(30, novaAltura) + 'px';
+    function renderizarLista() {
+      listaAlarmes.innerHTML = '';
+      if (alarmes.length === 0) {
+        listaAlarmes.innerHTML = '<div style="color:#999;">Sem alarmes guardados.</div>';
+        return;
       }
+      alarmes.forEach((alarme) => {
+        const item = document.createElement('div');
+        item.className = 'item-alarme';
+        item.innerHTML = `
+          <span>${formatarAlarme(alarme)}</span>
+          <button data-id="${alarme.id}">Remover</button>
+        `;
+        listaAlarmes.appendChild(item);
+      });
+    }
+    renderizarLista();
 
-      function soltar() {
-        document.removeEventListener('mousemove', mover);
-        document.removeEventListener('mouseup', soltar);
-        window.notaAPI.guardar(texto.innerHTML);
-      }
-
-      document.addEventListener('mousemove', mover);
-      document.addEventListener('mouseup', soltar);
+    btnAlarme.addEventListener('click', () => {
+      painelAlarme.style.display = 'flex';
     });
-  }
 
-  // Alarme functionality
-  const btnAlarme = document.getElementById('btnAlarme');
-  const painelAlarme = document.getElementById('painelAlarme');
-  const alarmeData = document.getElementById('alarmeData');
-  const alarmeHora = document.getElementById('alarmeHora'); 
-  const diasSemana = document.getElementById('diasSemana');
-  let diasSelecionados = [];
-  btnAlarme.addEventListener('click', () =>
-   { painelAlarme.style.display = painelAlarme.style.display === 'none' ? 'flex' : 'none'; 
-   });
+    btnFecharPainel.addEventListener('click', () => {
+      painelAlarme.style.display = 'none';
+    });
 
-   diasSemana.querySelectorAll('button').forEach((btn) => 
-   { btn.addEventListener('click', () => { const dia = parseInt(btn.dataset.dia, 10
-   );
-   if (diasSelecionados.includes(dia)) { diasSelecionados = diasSelecionados.filter((d) => d !== dia);
-   btn.classList.remove('ativo'); } else { diasSelecionados.push(dia); btn.classList.add('ativo'); } }); });
+    diasSemana.querySelectorAll('button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const dia = parseInt(btn.dataset.dia, 10);
+        if (diasSelecionados.includes(dia)) {
+          diasSelecionados = diasSelecionados.filter((d) => d !== dia);
+          btn.classList.remove('ativo');
+        } else {
+          diasSelecionados.push(dia);
+          btn.classList.add('ativo');
+        }
+      });
+    });
 
-   const btnGuardarAlarme = document.getElementById('btnGuardarAlarme');
-   btnGuardarAlarme.addEventListener('click', () => 
-   { const alarme = { hora: alarmeHora.value, dias: diasSelecionados.length ? diasSelecionados : null, data: diasSelecionados.length ? null : alarmeData.value };
-   window.notaAPI.guardarAlarme(alarme); painelAlarme.style.display = 'none'; });
+    btnGuardarAlarme.addEventListener('click', () => {
+      const novoAlarme = {
+        id: Date.now(),
+        hora: alarmeHora.value,
+        dias: diasSelecionados.length ? [...diasSelecionados] : null,
+        data: diasSelecionados.length ? null : alarmeData.value
+      };
+      alarmes.push(novoAlarme);
+      window.notaAPI.guardarAlarmes(alarmes);
+      renderizarLista();
 
-   const btnRemoverAlarme = document.getElementById('btnRemoverAlarme');
-   btnRemoverAlarme.addEventListener('click', () => { window.notaAPI.guardarAlarme(null); painelAlarme.style.display = 'none'; });
+      diasSelecionados = [];
+      diasSemana.querySelectorAll('button').forEach((b) => b.classList.remove('ativo'));
+      alarmeData.value = '';
+    });
+
+    listaAlarmes.addEventListener('click', (e) => {
+      if (e.target.tagName === 'BUTTON') {
+        const id = parseInt(e.target.dataset.id, 10);
+        alarmes = alarmes.filter((a) => a.id !== id);
+        window.notaAPI.guardarAlarmes(alarmes);
+        renderizarLista();
+      }
+    });
+
+    flatpickr('#alarmeData', {
+      dateFormat: 'Y-m-d'
+    });
+
+    flatpickr('#alarmeHora', {
+      enableTime: true,
+      noCalendar: true,
+      dateFormat: 'H:i',
+      time_24hr: true
+    });
+
+    if ('Notification' in window && Notification.permission === 'default') {
+  Notification.requestPermission();
+}
+
+  function tocarAlarme(alarme) {
+    document.body.classList.add('a-tocar');
+    setTimeout(() => document.body.classList.remove('a-tocar'), 2800);
+
+    const corpoNotificacao = texto.innerText.trim() || 'Tens um lembrete.';
+    if ('Notification' in window && Notification.permission === 'granted') {
+     new Notification('⏰ Lembrete', { body: corpoNotificacao });
+    }
+
+    try {
+      const ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctxAudio.createOscillator();
+      const gain = ctxAudio.createGain();
+      osc.connect(gain);
+      gain.connect(ctxAudio.destination);
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.001, ctxAudio.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.25, ctxAudio.currentTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctxAudio.currentTime + 0.6);
+      osc.start();
+      osc.stop(ctxAudio.currentTime + 0.65);
+    } catch (e) {}
+    const jaTocaramHoje = new Set();
+
+    setInterval(() => {
+      const agora = new Date();
+      const horaAtual = agora.toTimeString().slice(0, 5);
+      const diaSemanaAtual = agora.getDay();
+      const dataAtual = agora.toISOString().slice(0, 10);
+
+      alarmes.forEach((alarme) => {
+        if (alarme.hora !== horaAtual) return;
+
+        const aplicaHoje = alarme.dias
+          ? alarme.dias.includes(diaSemanaAtual)
+          : alarme.data === dataAtual;
+
+        if (!aplicaHoje) return;
+
+        const chave = alarme.id + '_' + dataAtual + '_' + horaAtual;
+        if (jaTocaramHoje.has(chave)) return;
+
+        jaTocaramHoje.add(chave);
+        tocarAlarme(alarme);
+      });
+    }, 15000);
+    }
   </script>
+</body>
 </html>
