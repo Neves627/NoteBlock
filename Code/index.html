@@ -16,9 +16,11 @@
     <button id="btnAlarme" title="Alarme">⏰</button>
   </div>
 
+  <input type="text" id="tituloNotaInput" placeholder="Título da nota...">
   <div contenteditable="true" id="texto" data-placeholder="Escreve a tua nota..." spellcheck="false"></div>
   <canvas id="canvas"></canvas>
 
+  <!-- Painel de Alarmes -->
   <div id="painelAlarme" class="painel-overlay" style="display:none;">
     <div class="painel-conteudo">
       <div class="painel-header">
@@ -27,8 +29,16 @@
       </div>
       <div id="listaAlarmes"></div>
       <div class="novo-alarme">
+        <input type="text" id="alarmeTitulo" placeholder="Título do alarme">
         <input type="date" id="alarmeData">
         <input type="time" id="alarmeHora" value="09:00">
+        
+        <select id="alarmeSom">
+          <option value="sons/alarme1.mp3">Alarme Padrão</option>
+          <option value="sons/digital.mp3">Digital</option>
+          <option value="sons/suave.mp3">Sino Suave</option>
+        </select>
+
         <div id="diasSemana">
           <button data-dia="0">D</button>
           <button data-dia="1">S</button>
@@ -44,10 +54,19 @@
     </div>
   </div>
 
-  <!-- A ordem importa: nota.js define "texto", usado pelos outros -->
-  <script src="js/nota.js"></script>
-  <script src="js/desenho.js"></script>
-  <script src="js/imagens.js"></script>
-  <script src="js/alarmes.js"></script>
+  <!-- Painel de Alarme a Tocar -->
+  <div id="painelTocar" class="painel-overlay" style="display:none;">
+    <div class="painel-conteudo" style="text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px;">
+      <h2 style="margin: 0; color: #b33a3a;">⏰ Alarme a Tocar!</h2>
+      <p id="tituloAlarmeAtivo" style="margin: 0; font-size: 16px; font-weight: bold; color: #333;"></p>
+      <p id="textoAlarmeAtivo" style="margin: 0; color: #666;"></p>
+      <button id="btnPararAlarme" style="padding: 10px 20px; background: #d64545; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">Parar Alarme</button>
+    </div>
+  </div>
+
+  <audio id="somAlarme" preload="auto"></audio>
+
+  <!-- Scripts organizados que trazem de volta todas as funcionalidades -->
+  <script src="js/nota-janela.js"></script>
 </body>
 </html>

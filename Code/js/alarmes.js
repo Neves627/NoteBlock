@@ -5,11 +5,20 @@ const btnAlarme = document.getElementById('btnAlarme');
 const painelAlarme = document.getElementById('painelAlarme');
 const btnFecharPainel = document.getElementById('btnFecharPainel');
 const listaAlarmes = document.getElementById('listaAlarmes');
+const alarmeTitulo = document.getElementById('alarmeTitulo');
 const alarmeData = document.getElementById('alarmeData');
 const alarmeHora = document.getElementById('alarmeHora');
+const alarmeSom = document.getElementById('alarmeSom');
 const diasSemana = document.getElementById('diasSemana');
 const btnGuardarAlarme = document.getElementById('btnGuardarAlarme');
 const erroAlarme = document.getElementById('erroAlarme');
+
+// Elementos do painel de alarme a tocar
+const painelTocar = document.getElementById('painelTocar');
+const btnPararAlarme = document.getElementById('btnPararAlarme');
+const tituloAlarmeAtivo = document.getElementById('tituloAlarmeAtivo');
+const textoAlarmeAtivo = document.getElementById('textoAlarmeAtivo');
+
 const NOMES_DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
 
 let alarmes = window.notaAPI.carregarAlarmes();
@@ -17,15 +26,22 @@ let diasSelecionados = [];
 
 // --- Lista ---
 function formatarAlarme(alarme) {
+  let textoAlarme = '';
   if (alarme.dias && alarme.dias.length) {
     const nomes = alarme.dias.map((d) => NOMES_DIAS[d]).join(', ');
-    return `${nomes} às ${alarme.hora}`;
-  }
-  if (alarme.data) {
+    textoAlarme = `${nomes} às ${alarme.hora}`;
+  } else if (alarme.data) {
     const d = new Date(alarme.data + 'T' + alarme.hora);
-    return d.toLocaleDateString('pt-PT') + ' às ' + alarme.hora;
+    textoAlarme = d.toLocaleDateString('pt-PT') + ' às ' + alarme.hora;
+  } else {
+    textoAlarme = `Todos os dias às ${alarme.hora}`;
   }
-  return `Todos os dias às ${alarme.hora}`;
+
+  // Se tiver título, inclui na visualização da lista
+  if (alarme.titulo && alarme.titulo.trim() !== '') {
+    return `<strong>${alarme.titulo}</strong> — ${textoAlarme}`;
+  }
+  return textoAlarme;
 }
 
 function renderizarLista() {
@@ -46,7 +62,7 @@ function renderizarLista() {
 }
 renderizarLista();
 
-// --- Abrir / fechar painel ---
+// --- Abrir / fechar painel de gestão ---
 btnAlarme.addEventListener('click', () => {
   painelAlarme.style.display = 'flex';
 });
@@ -69,7 +85,7 @@ diasSemana.querySelectorAll('button').forEach((btn) => {
   });
 });
 
-// --- Adicionar alarme (com validação) ---
+// --- Adicionar alarme ---
 function mostrarErroAlarme(mensagem) {
   erroAlarme.textContent = mensagem;
   erroAlarme.style.display = 'block';
@@ -91,14 +107,18 @@ btnGuardarAlarme.addEventListener('click', () => {
 
   const novoAlarme = {
     id: Date.now(),
+    titulo: alarmeTitulo.value.trim(),
     hora: alarmeHora.value,
     dias: diasSelecionados.length ? [...diasSelecionados] : null,
-    data: diasSelecionados.length ? null : alarmeData.value
+    data: diasSelecionados.length ? null : alarmeData.value,
+    som: alarmeSom.value
   };
   alarmes.push(novoAlarme);
   window.notaAPI.guardarAlarmes(alarmes);
   renderizarLista();
 
+  // Limpar campos
+  alarmeTitulo.value = '';
   diasSelecionados = [];
   diasSemana.querySelectorAll('button').forEach((b) => b.classList.remove('ativo'));
   seletorData.clear();
@@ -127,40 +147,60 @@ flatpickr('#alarmeHora', {
 });
 
 // ============================================
-// DISPARAR ALARMES
+// DISPARAR E PARAR ALARMES
 // ============================================
 if ('Notification' in window && Notification.permission === 'default') {
   Notification.requestPermission();
 }
 
 function tocarAlarme(alarme) {
-  // Pulso visual
+  // Iniciar animação visual contínua
   document.body.classList.add('a-tocar');
-  setTimeout(() => document.body.classList.remove('a-tocar'), 2800);
+
+  // Definir título e texto no painel de toque
+  tituloAlarmeAtivo.textContent = alarme.titulo ? alarme.titulo : 'Alarme';
+  const corpoNotificacao = texto.innerText.trim() || 'Tens um lembrete.';
+  textoAlarmeAtivo.textContent = corpoNotificacao;
+
+  // Mostrar painel de toque
+  painelTocar.style.display = 'flex';
 
   // Notificação do Windows
-  const corpoNotificacao = texto.innerText.trim() || 'Tens um lembrete.';
   if ('Notification' in window && Notification.permission === 'granted') {
-    new Notification('⏰ Lembrete', { body: corpoNotificacao });
+    new Notification(`⏰ ${alarme.titulo || 'Lembrete'}`, { body: corpoNotificacao });
   }
 
-  // Beep
+  // Tocar o som em loop contínuo até ser parado manualmente
   try {
-    const ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctxAudio.createOscillator();
-    const gain = ctxAudio.createGain();
-    osc.connect(gain);
-    gain.connect(ctxAudio.destination);
-    osc.frequency.value = 880;
-    gain.gain.setValueAtTime(0.001, ctxAudio.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.25, ctxAudio.currentTime + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctxAudio.currentTime + 0.6);
-    osc.start();
-    osc.stop(ctxAudio.currentTime + 0.65);
-  } catch (e) {}
+    const audioAlarme = document.getElementById('somAlarme');
+    if (audioAlarme) {
+      audioAlarme.src = alarme.som || 'sons/alarme1.mp3';
+      audioAlarme.currentTime = 0;
+      audioAlarme.loop = true;
+      audioAlarme.play().catch(err => console.log("Erro ao reproduzir áudio:", err));
+    }
+  } catch (e) {
+    console.log(e);
+  }
 }
 
-// Verificação periódica (fora da função tocarAlarme, a correr sempre)
+// Botão para parar o alarme manualmente
+btnPararAlarme.addEventListener('click', () => {
+  document.body.classList.remove('a-tocar');
+  painelTocar.style.display = 'none';
+
+  try {
+    const audioAlarme = document.getElementById('somAlarme');
+    if (audioAlarme) {
+      audioAlarme.pause();
+      audioAlarme.currentTime = 0;
+    }
+  } catch (e) {
+    console.log(e);
+  }
+});
+
+// Verificação periódica dos alarmes
 const jaTocaramHoje = new Set();
 
 function verificarAlarmes() {
@@ -178,7 +218,7 @@ function verificarAlarmes() {
     } else if (alarme.data) {
       aplicaHoje = alarme.data === dataAtual;
     } else {
-      aplicaHoje = true; // sem dias nem data = todos os dias
+      aplicaHoje = true;
     }
 
     if (!aplicaHoje) return;

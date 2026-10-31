@@ -4,17 +4,10 @@ const Store = require('electron-store');
 const store = new Store();
  
 contextBridge.exposeInMainWorld('notaAPI', {
-  guardar: (texto) => store.set('notaTexto', texto),
-  carregar: () => store.get('notaTexto', ''),
- 
-  guardarDesenho: (dataUrl) => store.set('notaDesenho', dataUrl),
-  carregarDesenho: () => store.get('notaDesenho', null),
- 
-  guardarTamanho: (largura, altura) => store.set('tamanhoJanela', { largura, altura }),
-  carregarTamanho: () => store.get('tamanhoJanela', { largura: 250, altura: 250 }),
- 
-  fecharJanela: () => ipcRenderer.send('fechar-janela'),
- 
-  guardarAlarmes: (lista) => store.set('notaAlarmes', lista),
-  carregarAlarmes: () => store.get('notaAlarmes', [])
+  carregarNotas: () => store.get('listaNotas', []),
+  guardarNotas: (notas) => store.set('listaNotas', notas),
+
+  abrirNotaJanela: (notaId) => ipcRenderer.send('abrir-nota', notaId),
+  fecharNotaPorId: (notaId) => ipcRenderer.send('fechar-nota-id', notaId),
+  fecharJanela: () => ipcRenderer.send('fechar-janela')
 });

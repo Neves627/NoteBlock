@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Controller de Notas</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body class="corpo-menu">
+  <div class="toolbar" style="-webkit-app-region: drag;">
+    <button id="btnFechar" title="Fechar" style="-webkit-app-region: no-drag;">❌</button>
+  </div>
+
+  <div class="cabecalho-menu" style="margin-top: 30px;">
+    <h2>Controller de Notas</h2>
+  </div>
+
+  <!-- Formulário direto para criar nota com nome -->
+  <div class="novo-alarme" style="margin-bottom: 12px; border: none; padding: 0;">
+    <input type="text" id="inputNovoNome" placeholder="Nome da nova nota..." style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; margin-bottom: 4px;">
+    <button id="btnCriarNota" style="background: #d99a2b; border: none; color: white; padding: 6px; border-radius: 4px; cursor: pointer; font-size: 12px;">➕ Criar Nota</button>
+  </div>
+  
+  <div id="listaNotasContainer"></div>
+
+  <script src="js/menu.js"></script>
+</body>
+</html>
