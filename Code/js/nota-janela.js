@@ -2,7 +2,6 @@
 // LÓGICA DA JANELA DE NOTA INDIVIDUAL
 // ============================================
 
-// Obter o ID da nota através da query string (ex: ?id=123456789)
 const urlParams = new URLSearchParams(window.location.search);
 const notaId = parseInt(urlParams.get('id'), 10);
 
@@ -24,23 +23,22 @@ const ctx = canvas.getContext('2d');
 tituloNotaInput.value = notaAtual.titulo || '';
 texto.innerHTML = notaAtual.conteudo || '';
 
-// Garante que guarda antes de fechar a janela
 btnFechar.addEventListener('click', () => {
   guardarNota();
   window.notaAPI.fecharJanela();
 });
 
-// Função para guardar alterações no store
+// Função para guardar diretamente no electron-store
 function guardarNota() {
   notaAtual.titulo = tituloNotaInput.value;
   notaAtual.conteudo = texto.innerHTML;
-  notaAtual.desenho = canvas.toDataURL(); // Converte o canvas para imagem base64
+  notaAtual.desenho = canvas.toDataURL();
   
-  notas = window.notaAPI.carregarNotas();
-  const index = notas.findIndex(n => n.id === notaId);
+  let listaAtualizada = window.notaAPI.carregarNotas();
+  const index = listaAtualizada.findIndex(n => n.id === notaId);
   if (index !== -1) {
-    notas[index] = notaAtual;
-    window.notaAPI.guardarNotas(notas);
+    listaAtualizada[index] = notaAtual;
+    window.notaAPI.guardarNotas(listaAtualizada);
   }
 }
 
@@ -64,24 +62,19 @@ function atualizarPlaceholder() {
 atualizarPlaceholder();
 
 // ============================================
-// DESENHO (Canvas Adaptativo e Persistente)
+// DESENHO (Canvas Adaptativo)
 // ============================================
 function ajustarTamanhoCanvas() {
-  const desenhoAtual = canvas.toDataURL();
-
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight - 40;
 
-  // Restaura o desenho guardado na nota ou na sessão
-  const imagemParaRestaurar = (desenhoAtual && desenhoAtual !== 'data:,') ? desenhoAtual : notaAtual.desenho;
-
-  if (imagemParaRestaurار || imagemParaRestaurar) {
-    const imgRestaurar = new Image();
-    imgRestaurar.onload = () => {
+  if (notaAtual.desenho) {
+    const imgDesenho = new Image();
+    imgDesenho.onload = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(imgRestaurar, 0, 0);
+      ctx.drawImage(imgDesenho, 0, 0);
     };
-    imgRestaurar.src = imagemParaRestaurar;
+    imgDesenho.src = notaAtual.desenho;
   }
 }
 
@@ -117,9 +110,6 @@ canvas.addEventListener('mousemove', (e) => {
   if (!aDesenhar) return;
   ctx.lineTo(e.offsetX, e.offsetY);
   ctx.stroke();
-  
-  // Guarda em tempo real à medida que desenhas para nunca perder dados
-  guardarNota();
 });
 
 canvas.addEventListener('mouseup', () => {

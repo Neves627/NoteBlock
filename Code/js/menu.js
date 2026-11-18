@@ -5,8 +5,35 @@ const btnFechar = document.getElementById('btnFechar');
 const btnCriarNota = document.getElementById('btnCriarNota');
 const inputNovoNome = document.getElementById('inputNovoNome');
 const listaNotasContainer = document.getElementById('listaNotasContainer');
+const btnTema = document.getElementById('btnTema');
+const iconeTema = btnTema ? btnTema.querySelector('i') : null;
 
 let notas = window.notaAPI.carregarNotas();
+
+// ============================================
+// GESTÃO DE TEMA (SOL / LUA) E IMAGENS DE FUNDO
+// ============================================
+const temaAtual = localStorage.getItem('theme') || 'light';
+if (temaAtual === 'dark') {
+  document.body.classList.add('dark-theme');
+  if (iconeTema) iconeTema.className = 'mdi mdi-weather-night';
+} else {
+  if (iconeTema) iconeTema.className = 'mdi mdi-white-balance-sunny';
+}
+
+if (btnTema) {
+  btnTema.addEventListener('click', () => {
+    document.body.classList.toggle('dark-theme');
+    
+    if (document.body.classList.contains('dark-theme')) {
+      if (iconeTema) iconeTema.className = 'mdi mdi-weather-night';
+      localStorage.setItem('theme', 'dark');
+    } else {
+      if (iconeTema) iconeTema.className = 'mdi mdi-white-balance-sunny';
+      localStorage.setItem('theme', 'light');
+    }
+  });
+}
 
 // Fechar a janela do menu
 btnFechar.addEventListener('click', () => {
@@ -55,11 +82,19 @@ function renderizarMenu() {
   notas.forEach((n) => {
     const item = document.createElement('div');
     item.className = 'item-menu-nota';
+    // Estilo para alinhar título à esquerda e botão à direita
+    item.style.display = 'flex';
+    item.style.justifyContent = 'space-between';
+    item.style.alignItems = 'center';
     
     const tituloSpan = document.createElement('span');
     tituloSpan.textContent = n.titulo || 'Nota sem título';
     tituloSpan.style.cursor = 'pointer';
     tituloSpan.style.flex = '1';
+    tituloSpan.style.overflow = 'hidden';
+    tituloSpan.style.textOverflow = 'ellipsis';
+    tituloSpan.style.whiteSpace = 'nowrap';
+    tituloSpan.style.marginRight = '8px';
     
     // Ao clicar no título, abre a janela dedicada a esta nota
     tituloSpan.addEventListener('click', () => {
@@ -68,20 +103,12 @@ function renderizarMenu() {
 
     const divBotoes = document.createElement('div');
     divBotoes.className = 'botoes-item-nota';
+    divBotoes.style.display = 'flex';
+    divBotoes.style.gap = '4px';
 
-    // Botão Esconder / Mostrar
-    const btnEsconder = document.createElement('button');
-    btnEsconder.textContent = n.oculta ? '👁️' : '👁️‍🗨️';
-    btnEsconder.title = n.oculta ? 'Mostrar nota' : 'Esconder nota';
-    btnEsconder.addEventListener('click', () => {
-      n.oculta = !n.oculta;
-      window.notaAPI.guardarNotas(notas);
-      renderizarMenu();
-    });
-
-    // Botão Apagar (fecha também a janela se estiver aberta)
+    // Botão Apagar com ícone moderno (Material Design Icons / delete-outline)
     const btnApagar = document.createElement('button');
-    btnApagar.textContent = '🗑️';
+    btnApagar.innerHTML = '<i class="mdi mdi-delete-outline"></i>';
     btnApagar.title = 'Apagar nota';
     btnApagar.addEventListener('click', () => {
       if (confirm(`Queres mesmo apagar a nota "${n.titulo}"?`)) {
@@ -95,15 +122,10 @@ function renderizarMenu() {
       }
     });
 
-    divBotoes.appendChild(btnEsconder);
     divBotoes.appendChild(btnApagar);
 
     item.appendChild(tituloSpan);
     item.appendChild(divBotoes);
-
-    if (n.oculta) {
-      item.classList.add('nota-oculta');
-    }
 
     listaNotasContainer.appendChild(item);
   });

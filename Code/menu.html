@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Controller de Notas</title>
+  <div class="cabecalho-menu" style="margin-top: 30px; text-align: left; padding-left: 4px;">
+    <img src="images/logo.png" alt="Logo" style="max-width: 180px; height: auto; display: block;">
+  </div>
   <link rel="stylesheet" href="css/estilos.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.2.96/css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.2.96/css/materialdesignicons.min.css">
 </head>
 <body class="corpo-menu">
   <div class="toolbar" style="-webkit-app-region: drag;">
-    <button id="btnFechar" title="Fechar" style="-webkit-app-region: no-drag;">❌</button>
-  </div>
-
-  <div class="cabecalho-menu" style="margin-top: 30px;">
-    <h2>Controller de Notas</h2>
-  </div>
+  <button id="btnTema" title="Alternar tema" style="-webkit-app-region: no-drag; right: 30px; position: absolute;">
+    <i class="mdi mdi-white-balance-sunny"></i>
+  </button>
+  <button id="btnFechar" title="Fechar" style="-webkit-app-region: no-drag;">❌</button>
+</div>
 
   <!-- Formulário direto para criar nota com nome -->
   <div class="novo-alarme" style="margin-bottom: 12px; border: none; padding: 0;">

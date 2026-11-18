@@ -20,7 +20,6 @@ function createMenuWindow() {
 }
 
 function createNoteWindow(notaId) {
-  // Carrega o tamanho guardado para esta nota específica (ou um tamanho predefinido)
   const tamanhosNotas = store.get('tamanhosNotas', {});
   const tamanhoGuardado = tamanhosNotas[notaId] || { width: 300, height: 350 };
 
@@ -38,7 +37,6 @@ function createNoteWindow(notaId) {
 
   win.notaId = notaId;
 
-  // Sempre que a janela for redimensionada, guarda automaticamente o tamanho atual no store
   win.on('resize', () => {
     const [width, height] = win.getSize();
     const currentTamanhos = store.get('tamanhosNotas', {});

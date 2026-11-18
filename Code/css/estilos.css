@@ -3,11 +3,48 @@ html, body {
 }
 
 body {
-  background-color: #fff2ba;
+  background-image: url('../images/controller_background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   margin: 0;
   padding: 16px;
   font-family: sans-serif;
   position: relative;
+  height: 100%;
+}
+
+/* ============ Tema Escuro com Imagem ============ */
+body.dark-theme {
+  background-image: url('../images/controller_background_dark.jpg') !important;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #e0e0e0;
+}
+
+body.dark-theme .cabecalho-menu h2 {
+  color: #ffffff;
+}
+
+body.dark-theme input[type="text"] {
+  background-color: rgba(45, 45, 45, 0.8);
+  color: #ffffff;
+  border-color: #444;
+}
+
+body.dark-theme input::placeholder {
+  color: #888;
+}
+
+body.dark-theme .item-menu-nota {
+  background-color: rgba(45, 45, 45, 0.8);
+  color: #ffffff;
+  border-color: #444;
+}
+
+body.dark-theme span {
+  color: #ffffff;
 }
 
 /* ============ Campo de Título da Nota ============ */
@@ -244,4 +281,29 @@ body.desenhando #texto {
 
 body.a-tocar {
   animation: alarmeAnimacao 1s ease-in-out infinite;
+}
+
+.botoes-item-nota button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #d9534f; /* Cor vermelha para o ícone */
+  transition: opacity 0.2s;
+}
+
+.botoes-item-nota button:hover {
+  opacity: 0.7; /* Fica ligeiramente transparente ao passar o rato */
+}
+
+#btnTema {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #333;
+}
+
+body.dark-theme #btnTema {
+  color: #f0f0f0;
 }
