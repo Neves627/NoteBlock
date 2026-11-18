@@ -34,7 +34,7 @@ btnFechar.addEventListener('click', () => {
 function guardarNota() {
   notaAtual.titulo = tituloNotaInput.value;
   notaAtual.conteudo = texto.innerHTML;
-  notaAtual.desenho = canvas.toDataURL();
+  notaAtual.desenho = canvas.toDataURL(); // Converte o canvas para imagem base64
   
   notas = window.notaAPI.carregarNotas();
   const index = notas.findIndex(n => n.id === notaId);
@@ -64,35 +64,32 @@ function atualizarPlaceholder() {
 atualizarPlaceholder();
 
 // ============================================
-// DESENHO (Canvas Adaptativo)
+// DESENHO (Canvas Adaptativo e Persistente)
 // ============================================
 function ajustarTamanhoCanvas() {
-  const dadosTemporarios = canvas.toDataURL();
-  
+  const desenhoAtual = canvas.toDataURL();
+
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight - 40;
 
-  // Restaurar o desenho anterior adaptado ao novo tamanho da janela
-  if (dadosTemporarios && dadosTemporarios !== 'data:,') {
+  // Restaura o desenho guardado na nota ou na sessão
+  const imagemParaRestaurar = (desenhoAtual && desenhoAtual !== 'data:,') ? desenhoAtual : notaAtual.desenho;
+
+  if (imagemParaRestaurار || imagemParaRestaurar) {
     const imgRestaurar = new Image();
     imgRestaurar.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(imgRestaurar, 0, 0);
     };
-    imgRestaurar.src = dadosTemporarios;
-  } else if (notaAtual.desenho) {
-    const imgDesenho = new Image();
-    imgDesenho.onload = () => { ctx.drawImage(imgDesenho, 0, 0); };
-    imgDesenho.src = notaAtual.desenho;
+    imgRestaurar.src = imagemParaRestaurar;
   }
 }
 
 ajustarTamanhoCanvas();
 
 let aDesenhar = false;
-let modoBorracha = false;
 
 document.getElementById('btnDesenhar').addEventListener('click', () => {
-  modoBorracha = false;
   ctx.globalCompositeOperation = 'source-over';
   ctx.strokeStyle = '#000000';
   ctx.lineWidth = 2;
@@ -101,7 +98,6 @@ document.getElementById('btnDesenhar').addEventListener('click', () => {
 
 document.getElementById('btnBorracha').addEventListener('click', () => {
   document.body.classList.add('desenhando');
-  modoBorracha = true;
   ctx.globalCompositeOperation = 'destination-out';
   ctx.lineWidth = 12;
 });
@@ -121,9 +117,11 @@ canvas.addEventListener('mousemove', (e) => {
   if (!aDesenhar) return;
   ctx.lineTo(e.offsetX, e.offsetY);
   ctx.stroke();
+  
+  // Guarda em tempo real à medida que desenhas para nunca perder dados
+  guardarNota();
 });
 
-// Garante o salvamento imediato assim que soltas o rato
 canvas.addEventListener('mouseup', () => {
   if (aDesenhar) {
     aDesenhar = false;
@@ -131,7 +129,6 @@ canvas.addEventListener('mouseup', () => {
   }
 });
 
-// Garante o salvamento se o rato sair de dentro do canvas enquanto desenhas
 canvas.addEventListener('mouseleave', () => {
   if (aDesenhar) {
     aDesenhar = false;
