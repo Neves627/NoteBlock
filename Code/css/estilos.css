@@ -339,3 +339,16 @@ body.dark-theme #btnTema {
   margin-top: -75px;
   margin-bottom: -75px;
 }
+
+#btnTema, #btnMinimizar {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #333;
+}
+
+body.dark-theme #btnTema,
+body.dark-theme #btnMinimizar {
+  color: #f0f0f0;
+}

@@ -9,5 +9,6 @@ contextBridge.exposeInMainWorld('notaAPI', {
 
   abrirNotaJanela: (notaId) => ipcRenderer.send('abrir-nota', notaId),
   fecharNotaPorId: (notaId) => ipcRenderer.send('fechar-nota-id', notaId),
-  fecharJanela: () => ipcRenderer.send('fechar-janela')
+  fecharJanela: () => ipcRenderer.send('fechar-janela'),
+  minimizarJanela: () => ipcRenderer.send('minimizar-janela'),
 });

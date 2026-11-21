@@ -129,6 +129,14 @@ function renderizarMenu() {
 
     listaNotasContainer.appendChild(item);
   });
+
+  const btnMinimizar = document.getElementById('btnMinimizar');
+
+  if (btnMinimizar) {
+    btnMinimizar.addEventListener('click', () => {
+      window.notaAPI.minimizarJanela();
+    });
+  }
 }
 
 // Inicializar o menu

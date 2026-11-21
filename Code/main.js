@@ -2,7 +2,12 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const Store = require('electron-store');
 const path = require('path');
 
+if (process.platform === 'win32') {
+  app.setAppUserModelId('com.noteblock.app');
+}
+
 const store = new Store();
+const iconPath = path.join(__dirname, 'images', 'logo_mini.png');
 
 function createMenuWindow() {
   const win = new BrowserWindow({
@@ -11,6 +16,7 @@ function createMenuWindow() {
     frame: false,
     alwaysOnTop: true,
     resizable: true,
+    icon: iconPath,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       sandbox: false
@@ -29,6 +35,7 @@ function createNoteWindow(notaId) {
     frame: false,
     alwaysOnTop: true,
     resizable: true,
+    icon: iconPath,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       sandbox: false
@@ -58,6 +65,13 @@ ipcMain.on('fechar-janela', (event) => {
 
 ipcMain.on('abrir-nota', (event, notaId) => {
   createNoteWindow(notaId);
+});
+
+ipcMain.on('minimizar-janela', (event) => {
+  const janela = BrowserWindow.fromWebContents(event.sender);
+  if (janela) {
+    janela.minimize();
+  }
 });
 
 ipcMain.on('fechar-nota-id', (event, notaId) => {
