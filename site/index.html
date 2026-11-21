@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NoteBlock — Notas rápidas no ambiente de trabalho</title>
+
+  <!-- Bibliotecas: Tailwind CSS (estilos) e Lucide Icons (ícones) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Configuração rápida de cores e fonte no Tailwind -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            dark: '#0B0A10',
+            card: '#13111C',
+            accent: '#7C3AED',
+            accentLight: '#A78BFA',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-dark text-gray-100 font-sans antialiased selection:bg-accent selection:text-white">
+
+  <!-- ==========================================
+       1. BARRA DE NAVEGAÇÃO
+       ========================================== -->
+  <header class="sticky top-0 z-50 bg-dark/80 backdrop-blur-md border-b border-purple-500/15">
+    <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+      
+      <!-- Logótipo NoteBlock -->
+      <a href="#" class="flex items-center gap-2.5 font-bold text-xl tracking-tight">
+        <svg viewBox="0 0 100 100" class="w-8 h-8">
+          <path d="M22 4H78C89.0457 4 98 12.9543 98 24V56L56 98H22C10.9543 98 2 89.0457 2 78V24C2 12.9543 10.9543 4 22 4Z" fill="#312066"/>
+          <path d="M56 98V72C56 63.1634 63.1634 56 72 56H98L56 98Z" fill="#6E5CB6"/>
+          <path d="M28 17L31.2 26.8L41 30L31.2 33.2L28 43L24.8 33.2L15 30L24.8 26.8L28 17Z" fill="#FFFFFF"/>
+        </svg>
+        <span>Note<span class="text-accentLight">Block</span></span>
+      </a>
+
+      <!-- Links simples -->
+      <nav class="hidden sm:flex items-center gap-6 text-sm text-gray-300">
+        <a href="#sobre" class="hover:text-accentLight transition">Sobre & Intuito</a>
+        <a href="#autor" class="hover:text-accentLight transition">Sobre Mim</a>
+      </nav>
+
+      <!-- Botão de Download -->
+      <a href="#download" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent hover:bg-purple-500 text-sm font-semibold transition">
+        <i data-lucide="download" class="w-4 h-4"></i>
+        <span>Transferir</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       2. SECÇÃO PRINCIPAL (HERO + DEMONSTRAÇÃO)
+       ========================================== -->
+  <section id="download" class="relative pt-14 pb-20 px-4 bg-[radial-gradient(ellipse_at_top,_rgba(124,58,237,0.22),_transparent_65%)]">
+    <div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+      
+      <!-- Texto e Botão de Instalação -->
+      <div class="lg:col-span-6 text-center lg:text-left space-y-6">
+        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-950/80 border border-purple-500/30 text-accentLight text-xs font-medium">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Windows 10/11 • Auto-Update Ativo
+        </span>
+
+        <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight">
+          As tuas notas rápidas, sempre no <span class="text-accentLight">teu ecrã.</span>
+        </h1>
+
+        <p class="text-gray-300 text-base leading-relaxed">
+          Uma aplicação leve para Windows que mantém os teus apontamentos visíveis no ambiente de trabalho, com tema claro/escuro e atualizações automáticas.
+        </p>
+
+        <!-- LINK DO EXECUTÁVEL: Substitui pelo link real do teu GitHub Releases -->
+        <div class="pt-2">
+          <a href="https://github.com/Neves627/NoteBlock/releases/latest/download/NoteBlock-Setup.exe"
+             class="inline-flex items-center gap-3 px-7 py-4 rounded-2xl bg-accent hover:bg-purple-500 text-white font-semibold shadow-lg shadow-purple-700/30 transition">
+            <i data-lucide="monitor-down" class="w-6 h-6"></i>
+            <div class="text-left">
+              <div class="leading-none">Transferir para Windows</div>
+              <div class="text-xs text-purple-200 font-normal mt-1">Instalador (.exe) • v1.0.0</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Widget Interativo (Testa a app diretamente no site) -->
+      <div class="lg:col-span-6">
+        <div class="bg-card border border-purple-500/20 rounded-3xl p-5 shadow-2xl">
+          <div class="flex items-center justify-between mb-4 text-xs text-gray-400">
+            <span class="font-semibold text-accentLight flex items-center gap-1.5">
+              <i data-lucide="play-circle" class="w-4 h-4"></i> Experimenta aqui
+            </span>
+            <button onclick="alternarTema()" class="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-purple-950 hover:bg-purple-900 text-purple-200 border border-purple-500/30 transition cursor-pointer">
+              <i data-lucide="sun-moon" class="w-3.5 h-3.5"></i>
+              <span>Mudar Tema</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Controlador -->
+            <div id="appControlador" class="bg-gray-100 text-gray-900 rounded-2xl p-4 shadow-md transition-colors">
+              <div class="flex items-center gap-2 font-bold text-sm mb-3">
+                <span class="w-2.5 h-2.5 rounded-full bg-accent"></span> Noteblock
+              </div>
+              <input id="novaNotaInput" type="text" placeholder="Nome da nota..." class="w-full px-2.5 py-1.5 rounded-lg text-xs bg-white text-gray-800 border border-gray-300 mb-2 focus:outline-none focus:border-accent">
+              <button onclick="criarNota()" class="w-full py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs mb-3 cursor-pointer">
+                + Criar Nota
+              </button>
+              <ul id="listaNotas" class="space-y-1.5 text-xs font-medium">
+                <li class="flex justify-between items-center px-2 py-1 rounded bg-black/5">
+                  <span>Ideias App</span>
+                  <button onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-600 cursor-pointer">✕</button>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Nota Aberta -->
+            <div id="appNota" class="bg-gray-100 text-gray-900 rounded-2xl p-4 shadow-md transition-colors">
+              <div id="tituloNotaAberta" class="font-bold text-sm border-b border-current/10 pb-1.5 mb-2">Ideias App</div>
+              <textarea rows="5" class="w-full bg-transparent text-xs resize-none focus:outline-none" placeholder="Escreve aqui...">• Site com tema roxo e preto
+• Auto-update via GitHub
+• Super simples de usar!</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       3. SOBRE & INTUITO DO PROJETO
+       ========================================== -->
+  <section id="sobre" class="py-16 px-4 border-t border-purple-500/10">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center max-w-xl mx-auto mb-12">
+        <h2 class="text-3xl font-bold mb-3">Sobre & Intuito</h2>
+        <p class="text-gray-400 text-sm leading-relaxed">
+          O <strong class="text-white">NoteBlock</strong> nasceu para substituir os papéis soltos na secretária por notas digitais rápidas, leves e sempre visíveis no Windows — sem distrações nem contas obrigatórias.
+        </p>
+      </div>
+
+      <!-- 3 Cartões Simples -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-card border border-purple-500/15 rounded-2xl p-6">
+          <i data-lucide="pin" class="w-7 h-7 text-accentLight mb-3"></i>
+          <h3 class="font-bold text-lg mb-1">Sempre Visível</h3>
+          <p class="text-gray-400 text-sm">Fixa as notas por cima de qualquer janela para nunca perderes o foco nas tuas tarefas.</p>
+        </div>
+
+        <div class="bg-card border border-purple-500/15 rounded-2xl p-6">
+          <i data-lucide="refresh-cw" class="w-7 h-7 text-accentLight mb-3"></i>
+          <h3 class="font-bold text-lg mb-1">Updates Automáticos</h3>
+          <p class="text-gray-400 text-sm">Sempre que houver novidades ou melhorias, a aplicação atualiza-se sozinha ao abrir.</p>
+        </div>
+
+        <div class="bg-card border border-purple-500/15 rounded-2xl p-6">
+          <i data-lucide="palette" class="w-7 h-7 text-accentLight mb-3"></i>
+          <h3 class="font-bold text-lg mb-1">Leve & Personalizável</h3>
+          <p class="text-gray-400 text-sm">Alterna entre papel claro e escuro e guarda automaticamente o tamanho de cada nota.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       4. SOBRE MIM (EDITA AQUI OS TEUS DADOS)
+       ========================================== -->
+  <section id="autor" class="py-16 pb-24 px-4">
+    <div class="max-w-3xl mx-auto bg-card border border-purple-500/20 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6">
+      
+      <!-- INICIAL DO TEU NOME -->
+      <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-accent to-purple-900 flex items-center justify-center text-3xl font-extrabold shrink-0">
+        D
+      </div>
+
+      <div class="text-center sm:text-left space-y-3">
+        <!-- EDITA O TEU NOME AQUI -->
+        <h2 class="text-2xl font-bold">Diogo (Neves627)</h2>
+
+        <!-- EDITA A TUA DESCRIÇÃO PESSOAL AQUI -->
+        <p class="text-gray-300 text-sm leading-relaxed">
+          Criador do NoteBlock. Desenvolvi esta aplicação com o intuito de criar uma ferramenta simples, rápida e bonita para organizar notas no dia a dia.
+        </p>
+
+        <!-- EDITA OS TEUS LINKS DE CONTACTO AQUI -->
+        <div class="flex flex-wrap justify-center sm:justify-start gap-3 pt-1 text-xs font-medium">
+          <a href="https://github.com/Neves627" target="_blank" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-dark border border-purple-500/25 hover:border-accentLight transition">
+            <i data-lucide="github" class="w-4 h-4 text-accentLight"></i> GitHub
+          </a>
+          <a href="mailto:teu-email@exemplo.com" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-dark border border-purple-500/25 hover:border-accentLight transition">
+            <i data-lucide="mail" class="w-4 h-4 text-accentLight"></i> teu-email@exemplo.com
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       5. RODAPÉ
+       ========================================== -->
+  <footer class="border-t border-purple-500/15 py-6 px-4 text-center text-xs text-gray-400">
+    <p>© 2026 NoteBlock • Criado por Diogo</p>
+  </footer>
+
+  <!-- ==========================================
+       JAVASCRIPT (ÍCONES + DEMONSTRAÇÃO)
+       ========================================== -->
+  <script>
+    // Inicializa os ícones da biblioteca Lucide
+    lucide.createIcons();
+
+    let modoEscuro = false;
+
+    function alternarTema() {
+      modoEscuro = !modoEscuro;
+      const controlador = document.getElementById('appControlador');
+      const nota = document.getElementById('appNota');
+
+      [controlador, nota].forEach(el => {
+        el.classList.toggle('bg-gray-100', !modoEscuro);
+        el.classList.toggle('text-gray-900', !modoEscuro);
+        el.classList.toggle('bg-[#1E1B2E]', modoEscuro);
+        el.classList.toggle('text-gray-100', modoEscuro);
+      });
+    }
+
+    function criarNota() {
+      const input = document.getElementById('novaNotaInput');
+      const nome = input.value.trim();
+      if (!nome) return;
+
+      const li = document.createElement('li');
+      li.className = 'flex justify-between items-center px-2 py-1 rounded bg-purple-500/15';
+      li.innerHTML = `<span>${nome}</span><button onclick="this.parentElement.remove()" class="text-rose-500 cursor-pointer">✕</button>`;
+      
+      document.getElementById('listaNotas').prepend(li);
+      document.getElementById('tituloNotaAberta').textContent = nome;
+      input.value = '';
+    }
+  </script>
+</body>
+</html>

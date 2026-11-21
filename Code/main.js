@@ -1,4 +1,5 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const Store = require('electron-store');
 const path = require('path');
 
@@ -56,6 +57,23 @@ function createNoteWindow(notaId) {
 
 app.whenReady().then(() => {
   createMenuWindow();
+
+  // Verifica atualizações automaticamente (apenas na versão compilada)
+  if (app.isPackaged) {
+    autoUpdater.checkForUpdatesAndNotify();
+  }
+});
+
+// Opcional: avisar o utilizador quando o update estiver pronto para reiniciar
+autoUpdater.on('update-downloaded', () => {
+  dialog.showMessageBox({
+    type: 'info',
+    title: 'Atualização disponível',
+    message: 'Uma nova versão do NoteBlock foi descarregada. A aplicação vai reiniciar para atualizar.',
+    buttons: ['Reiniciar agora']
+  }).then(() => {
+    autoUpdater.quitAndInstall();
+  });
 });
 
 ipcMain.on('fechar-janela', (event) => {

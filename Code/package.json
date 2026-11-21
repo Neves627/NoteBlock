@@ -17,11 +17,19 @@
     "electron-builder": "^26.18.0"
   },
   "dependencies": {
-    "electron-store": "^8.2.0"
+    "electron-store": "^8.2.0",
+    "electron-updater": "^6.8.11"
   },
   "build": {
     "appId": "com.noteblock.app",
     "productName": "NoteBlock",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Neves627",
+        "repo": "NoteBlock"
+      }
+    ],
     "win": {
       "icon": "images/logo_mini.png",
       "target": [
