@@ -17,12 +17,19 @@ function createMenuWindow() {
     frame: false,
     alwaysOnTop: true,
     resizable: true,
+    show: false,
+    backgroundColor: '#12101c',
     icon: iconPath,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       sandbox: false
     }
   });
+
+  win.once('ready-to-show', () => {
+    win.show();
+  });
+
   win.loadFile('menu.html');
 }
 

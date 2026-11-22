@@ -1,31 +1,100 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt" data-theme="light">
 <head>
-  <div class="cabecalho-menu" style="margin-top: 30px; text-align: left; padding-left: 4px;">
-    <img src="images/logo2.png" alt="Logo" style="max-width: 180px; height: auto; display: block;">
-  </div>
+  <meta charset="UTF-8">
+  <title>NoteBlock</title>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.2.96/css/materialdesignicons.min.css">
   <link rel="stylesheet" href="css/estilos.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.2.96/css/materialdesignicons.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.2.96/css/materialdesignicons.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            accent: '#7C3AED',
+            accentLight: '#A78BFA'
+          }
+        }
+      }
+    };
+  </script>
 </head>
-<body class="corpo-menu">
-  <div class="toolbar" style="-webkit-app-region: drag;">
-  <button id="btnMinimizar" title="Minimizar" style="-webkit-app-region: no-drag; right: 60px; position: absolute;">
-    <i class="mdi mdi-window-minimize"></i>
-  </button>
-  <button id="btnTema" title="Alternar tema" style="-webkit-app-region: no-drag; right: 30px; position: absolute;">
-    <i class="mdi mdi-white-balance-sunny"></i>
-  </button>
-  <button id="btnFechar" title="Fechar" style="-webkit-app-region: no-drag;">❌</button>
-</div>
+<body class="corpo-menu min-h-screen select-none overflow-x-hidden bg-slate-50 text-slate-800 dark:bg-[#12101c] dark:text-slate-100 transition-colors duration-200">
 
-  <!-- Formulário direto para criar nota com nome -->
-  <div class="novo-alarme" style="margin-bottom: 12px; border: none; padding: 0;">
-    <input type="text" id="inputNovoNome" placeholder="Nome da nova nota..." style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; margin-bottom: 4px;">
-    <button id="btnCriarNota" style="background: #d99a2b; border: none; color: white; padding: 6px; border-radius: 4px; cursor: pointer; font-size: 12px;">➕ Criar Nota</button>
+  <!-- Barra superior arrastável -->
+  <div
+    class="h-8 px-2.5 flex items-center justify-between border-b border-slate-200/80 dark:border-purple-500/15 bg-white/80 dark:bg-[#181526]/90 backdrop-blur-sm"
+    style="-webkit-app-region: drag;"
+  >
+    <span class="text-[11px] font-semibold tracking-wide text-slate-500 dark:text-purple-300/80">
+      NoteBlock
+    </span>
+
+    <div class="flex items-center gap-1" style="-webkit-app-region: no-drag;">
+      <button
+        id="btnMinimizar"
+        title="Minimizar"
+        class="btn btn-ghost btn-xs btn-square text-slate-600 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-white/10"
+      >
+        <i class="mdi mdi-window-minimize text-sm"></i>
+      </button>
+
+      <button
+        id="btnTema"
+        title="Alternar tema"
+        class="btn btn-ghost btn-xs btn-square text-amber-500 dark:text-purple-300 hover:bg-slate-200/70 dark:hover:bg-white/10"
+      >
+        <i class="mdi mdi-white-balance-sunny text-sm"></i>
+      </button>
+
+      <button
+        id="btnFechar"
+        title="Fechar"
+        class="btn btn-ghost btn-xs btn-square text-rose-500 hover:bg-rose-500/15"
+      >
+        <i class="mdi mdi-close text-sm"></i>
+      </button>
+    </div>
   </div>
-  
-  <div id="listaNotasContainer"></div>
+
+  <!-- Conteúdo principal -->
+  <div class="p-3 space-y-3">
+    <!-- Logo + título -->
+    <div class="cabecalho-menu flex items-center gap-2.5 px-1 pt-0.5">
+      <img
+        src="images/logo2.png"
+        alt="NoteBlock Logo"
+        class="h-7 w-auto object-contain"
+      >
+    </div>
+
+    <!-- Criar nova nota -->
+    <div class="bg-white dark:bg-[#1b182b] border border-slate-200/90 dark:border-purple-500/20 rounded-2xl p-2.5 shadow-sm space-y-2">
+      <input
+        type="text"
+        id="inputNovoNome"
+        placeholder="Nome da nova nota..."
+        class="input input-bordered input-sm w-full bg-slate-50 dark:bg-[#13111f] border-slate-200 dark:border-purple-500/25 text-xs focus:outline-none focus:border-accent"
+      >
+      <button
+        id="btnCriarNota"
+        class="btn btn-sm w-full bg-accent hover:bg-purple-600 border-none text-white font-medium gap-1.5 rounded-xl shadow-sm shadow-purple-600/25"
+      >
+        <i class="mdi mdi-plus text-base"></i>
+        <span>Criar Nota</span>
+      </button>
+    </div>
+
+    <!-- Lista de notas -->
+    <div class="space-y-1.5">
+      <div class="px-1 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+        <span>As tuas notas</span>
+      </div>
+      <div id="listaNotasContainer" class="space-y-1.5"></div>
+    </div>
+  </div>
 
   <script src="js/menu.js"></script>
 </body>

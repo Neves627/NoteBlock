@@ -19,6 +19,29 @@ const texto = document.getElementById('texto');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
+// Fecho da nota
+if (btnFechar) {
+  btnFechar.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    try {
+      if (typeof guardarNota === 'function') {
+        guardarNota();
+      }
+    } catch (err) {
+      console.error('Erro ao guardar nota ao fechar:', err);
+    }
+
+    if (window.notaAPI && typeof window.notaAPI.fecharJanela === 'function') {
+      window.notaAPI.fecharJanela();
+    } else {
+      window.close();
+    }
+  });
+}
+
+
 // Carregar dados iniciais da nota
 tituloNotaInput.value = notaAtual.titulo || '';
 texto.innerHTML = notaAtual.conteudo || '';
@@ -33,6 +56,7 @@ function guardarNota() {
   notaAtual.titulo = tituloNotaInput.value;
   notaAtual.conteudo = texto.innerHTML;
   notaAtual.desenho = canvas.toDataURL();
+  notaAtual.fundo = fundoAtualId;
   
   let listaAtualizada = window.notaAPI.carregarNotas();
   const index = listaAtualizada.findIndex(n => n.id === notaId);
