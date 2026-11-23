@@ -23,34 +23,61 @@
 
   <!-- Painel de Alarmes -->
   <div id="painelAlarme" class="painel-overlay" style="display:none;">
-    <div class="painel-conteudo">
-      <div class="painel-header">
-        <span>Alarmes</span>
-        <button id="btnFecharPainel">✕</button>
-      </div>
-      <div id="listaAlarmes"></div>
-      <div class="novo-alarme">
-        <input type="text" id="alarmeTitulo" placeholder="Título do alarme">
-        <input type="date" id="alarmeData">
-        <input type="time" id="alarmeHora" value="09:00">
-        
-        <select id="alarmeSom">
-          <option value="sons/alarme1.mp3">Alarme Padrão</option>
-          <option value="sons/digital.mp3">Digital</option>
-          <option value="sons/suave.mp3">Sino Suave</option>
-        </select>
-
-        <div id="diasSemana">
-          <button data-dia="0">D</button>
-          <button data-dia="1">S</button>
-          <button data-dia="2">T</button>
-          <button data-dia="3">Q</button>
-          <button data-dia="4">Q</button>
-          <button data-dia="5">S</button>
-          <button data-dia="6">S</button>
+    <div class="painel-conteudo alarme-modal">
+      <div class="painel-header alarme-header">
+        <div>
+          <span class="alarme-titulo-modal">⏰ Alarmes</span>
+          <small class="alarme-subtitulo">Lembretes desta nota</small>
         </div>
-        <div id="erroAlarme" style="display:none;"></div>
-        <button id="btnGuardarAlarme">Adicionar alarme</button>
+        <button id="btnFecharPainel" title="Fechar">✕</button>
+      </div>
+
+      <div id="listaAlarmes" class="alarme-lista"></div>
+
+      <div class="novo-alarme alarme-form">
+        <div class="alarme-campo">
+          <label for="alarmeTitulo">Título (opcional)</label>
+          <input type="text" id="alarmeTitulo" placeholder="Ex.: Reunião, tomar medicação...">
+        </div>
+
+        <div class="alarme-linha-2col">
+          <div class="alarme-campo">
+            <label for="alarmeHora">Hora</label>
+            <input type="time" id="alarmeHora" value="09:00">
+          </div>
+          <div class="alarme-campo">
+            <label for="alarmeSom">Som</label>
+            <select id="alarmeSom">
+              <option value="sons/alarme1.mp3">🔔 Alarme Padrão</option>
+              <option value="sons/digital.mp3">⚡ Digital</option>
+              <option value="sons/suave.mp3">🎵 Sino Suave</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="alarme-campo">
+          <div class="alarme-label-row">
+            <label>Repetir nos dias</label>
+            <button type="button" id="btnDiasUteis" class="alarme-chip-acao">Seg–Sex</button>
+          </div>
+          <div id="diasSemana" class="alarme-dias-grid">
+            <button type="button" data-dia="0">Dom</button>
+            <button type="button" data-dia="1">Seg</button>
+            <button type="button" data-dia="2">Ter</button>
+            <button type="button" data-dia="3">Qua</button>
+            <button type="button" data-dia="4">Qui</button>
+            <button type="button" data-dia="5">Sex</button>
+            <button type="button" data-dia="6">Sáb</button>
+          </div>
+        </div>
+
+        <div class="alarme-campo">
+          <label for="alarmeData">Ou numa data específica <span class="alarme-dica">(se não escolheres dias)</span></label>
+          <input type="date" id="alarmeData" placeholder="Escolher data...">
+        </div>
+
+        <div id="erroAlarme" class="alarme-erro" style="display:none;"></div>
+        <button type="button" id="btnGuardarAlarme" class="alarme-btn-guardar">+ Guardar alarme</button>
       </div>
     </div>
   </div>

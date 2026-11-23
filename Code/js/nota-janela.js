@@ -41,23 +41,19 @@ if (btnFechar) {
   });
 }
 
-
 // Carregar dados iniciais da nota
 tituloNotaInput.value = notaAtual.titulo || '';
 texto.innerHTML = notaAtual.conteudo || '';
-
-btnFechar.addEventListener('click', () => {
-  guardarNota();
-  window.notaAPI.fecharJanela();
-});
 
 // Função para guardar diretamente no electron-store
 function guardarNota() {
   notaAtual.titulo = tituloNotaInput.value;
   notaAtual.conteudo = texto.innerHTML;
   notaAtual.desenho = canvas.toDataURL();
-  notaAtual.fundo = fundoAtualId;
-  
+  if (typeof fundoAtualId !== 'undefined') {
+    notaAtual.fundo = fundoAtualId;
+  }
+
   let listaAtualizada = window.notaAPI.carregarNotas();
   const index = listaAtualizada.findIndex(n => n.id === notaId);
   if (index !== -1) {
@@ -247,13 +243,68 @@ const alarmeData = document.getElementById('alarmeData');
 const alarmeHora = document.getElementById('alarmeHora');
 const alarmeSom = document.getElementById('alarmeSom');
 const diasSemana = document.getElementById('diasSemana');
+const btnDiasUteis = document.getElementById('btnDiasUteis');
 const btnGuardarAlarme = document.getElementById('btnGuardarAlarme');
 const erroAlarme = document.getElementById('erroAlarme');
+
+const NOMES_DIAS_CURTOS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 let diasSelecionados = [];
 
-btnAlarme.addEventListener('click', () => { painelAlarme.style.display = 'flex'; });
-btnFecharPainel.addEventListener('click', () => { painelAlarme.style.display = 'none'; });
+const seletorData = flatpickr('#alarmeData', {
+  dateFormat: 'Y-m-d',
+  onChange: () => {
+    // Se escolher uma data específica, limpa os dias da semana para não confundir
+    if (alarmeData.value) {
+      diasSelecionados = [];
+      diasSemana.querySelectorAll('button').forEach(b => b.classList.remove('ativo'));
+    }
+  }
+});
 
+flatpickr('#alarmeHora', {
+  enableTime: true,
+  noCalendar: true,
+  dateFormat: 'H:i',
+  time_24hr: true
+});
+
+btnAlarme.addEventListener('click', () => {
+  painelAlarme.style.display = 'flex';
+});
+
+btnFecharPainel.addEventListener('click', () => {
+  painelAlarme.style.display = 'none';
+});
+
+// Fechar ao clicar fora do modal
+painelAlarme.addEventListener('click', (e) => {
+  if (e.target === painelAlarme) {
+    painelAlarme.style.display = 'none';
+  }
+});
+
+// Atalho Seg–Sex
+if (btnDiasUteis) {
+  btnDiasUteis.addEventListener('click', () => {
+    const diasUteis = [1, 2, 3, 4, 5];
+    const jaEstaoTodos =
+      diasUteis.every((d) => diasSelecionados.includes(d)) &&
+      diasSelecionados.length === 5;
+
+    diasSelecionados = jaEstaoTodos ? [] : diasUteis;
+
+    diasSemana.querySelectorAll('button').forEach((btn) => {
+      const dia = parseInt(btn.dataset.dia, 10);
+      btn.classList.toggle('ativo', diasSelecionados.includes(dia));
+    });
+
+    if (diasSelecionados.length > 0) {
+      seletorData.clear();
+    }
+  });
+}
+
+// Seleção individual de dias da semana
 diasSemana.querySelectorAll('button').forEach((btn) => {
   btn.addEventListener('click', () => {
     const dia = parseInt(btn.dataset.dia, 10);
@@ -263,64 +314,110 @@ diasSemana.querySelectorAll('button').forEach((btn) => {
     } else {
       diasSelecionados.push(dia);
       btn.classList.add('ativo');
+      // Limpa a data específica se o utilizador escolheu dias recorrentes
+      seletorData.clear();
     }
   });
 });
 
+function descreverRepeticaoAlarme(alarme) {
+  if (alarme.dias && alarme.dias.length) {
+    const ordenados = [...alarme.dias].sort((a, b) => a - b);
+    if (ordenados.length === 7) return 'Todos os dias';
+    if (
+      ordenados.length === 5 &&
+      [1, 2, 3, 4, 5].every((d) => ordenados.includes(d))
+    ) {
+      return 'Dias úteis (Seg–Sex)';
+    }
+    return ordenados.map((d) => NOMES_DIAS_CURTOS[d]).join(', ');
+  }
+  if (alarme.data) {
+    const [ano, mes, dia] = alarme.data.split('-');
+    return `${dia}/${mes}/${ano}`;
+  }
+  return 'Todos os dias';
+}
+
 function renderizarListaAlarmes() {
   if (!notaAtual.alarmes) notaAtual.alarmes = [];
   listaAlarmes.innerHTML = '';
-  
+
   if (notaAtual.alarmes.length === 0) {
-    listaAlarmes.innerHTML = '<div style="color:#999;">Sem alarmes nesta nota.</div>';
+    listaAlarmes.innerHTML = '<div class="alarme-vazio">Sem alarmes nesta nota. Cria um abaixo.</div>';
     return;
   }
 
   notaAtual.alarmes.forEach((alarme) => {
     const item = document.createElement('div');
-    item.className = 'item-alarme';
-    let txt = alarme.hora;
-    if (alarme.titulo) txt = `${alarme.titulo} (${txt})`;
-    item.innerHTML = `<span>${txt}</span><button data-id="${alarme.id}">Remover</button>`;
+    item.className = 'alarme-cartao';
+
+    const repeticao = descreverRepeticaoAlarme(alarme);
+    const titulo = alarme.titulo && alarme.titulo.trim() ? alarme.titulo.trim() : 'Lembrete da nota';
+
+    item.innerHTML = `
+      <div class="alarme-cartao-hora">${alarme.hora}</div>
+      <div class="alarme-cartao-info">
+        <div class="alarme-cartao-titulo">${titulo}</div>
+        <div class="alarme-cartao-meta">${repeticao}</div>
+      </div>
+      <button type="button" class="alarme-btn-remover" data-id="${alarme.id}" title="Remover alarme">🗑</button>
+    `;
     listaAlarmes.appendChild(item);
   });
 }
 renderizarListaAlarmes();
 
+function mostrarErroAlarme(mensagem) {
+  erroAlarme.textContent = mensagem;
+  erroAlarme.style.display = 'block';
+  setTimeout(() => {
+    erroAlarme.style.display = 'none';
+  }, 3000);
+}
+
 btnGuardarAlarme.addEventListener('click', () => {
   if (!alarmeHora.value) {
-    erroAlarme.textContent = 'Escolhe uma hora.';
-    erroAlarme.style.display = 'block';
+    mostrarErroAlarme('Escolhe uma hora para o alarme.');
     return;
   }
+
+  if (diasSelecionados.length === 0 && !alarmeData.value) {
+    mostrarErroAlarme('Escolhe uma data ou pelo menos um dia da semana.');
+    return;
+  }
+
   if (!notaAtual.alarmes) notaAtual.alarmes = [];
 
   notaAtual.alarmes.push({
     id: Date.now(),
     titulo: alarmeTitulo.value.trim(),
     hora: alarmeHora.value,
-    dias: diasSelecionados.length ? [...diasSelecionados] : null,
+    dias: diasSelecionados.length ? [...diasSelecionados].sort((a, b) => a - b) : null,
     data: diasSelecionados.length ? null : alarmeData.value,
     som: alarmeSom.value
   });
+
   guardarNota();
   renderizarListaAlarmes();
+
+  // Limpar formulário
   alarmeTitulo.value = '';
   diasSelecionados = [];
   diasSemana.querySelectorAll('button').forEach(b => b.classList.remove('ativo'));
+  seletorData.clear();
+  erroAlarme.style.display = 'none';
 });
 
 listaAlarmes.addEventListener('click', (e) => {
-  if (e.target.tagName === 'BUTTON') {
-    const id = parseInt(e.target.dataset.id, 10);
+  const btnRemover = e.target.closest('.alarme-btn-remover');
+  if (btnRemover) {
+    const id = parseInt(btnRemover.dataset.id, 10);
     notaAtual.alarmes = notaAtual.alarmes.filter(a => a.id !== id);
     guardarNota();
     renderizarListaAlarmes();
   }
 });
-
-flatpickr('#alarmeData', { dateFormat: 'Y-m-d' });
-flatpickr('#alarmeHora', { enableTime: true, noCalendar: true, dateFormat: 'H:i', time_24hr: true });
 
 // ============================================
 // DISPARAR ALARME NA JANELA
@@ -359,7 +456,7 @@ btnPararAlarme.addEventListener('click', () => {
 const jaTocaramHoje = new Set();
 function verificarAlarmesNota() {
   if (notaAtual.oculta || !notaAtual.alarmes) return;
-  
+
   const agora = new Date();
   const horaAtual = agora.toTimeString().slice(0, 5);
   const diaSemanaAtual = agora.getDay();

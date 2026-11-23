@@ -402,3 +402,262 @@ html[data-theme="dark"] .caixa-criar-nota-externa,
 ::-webkit-scrollbar {
   display: none;
 }
+
+/* ============================================
+   ESTÉTICA MODERNA DO MENU DE ALARMES
+   ============================================ */
+.alarme-modal {
+  max-width: 360px;
+  width: 92%;
+  max-height: 88vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  padding: 16px;
+  background: #ffffff;
+  color: #1e293b;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.22);
+}
+
+.alarme-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.alarme-titulo-modal {
+  font-size: 16px;
+  font-weight: 700;
+  display: block;
+}
+
+.alarme-subtitulo {
+  font-size: 11px;
+  color: #64748b;
+}
+
+#btnFecharPainel {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: none;
+  background: #f1f5f9;
+  color: #475569;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+#btnFecharPainel:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Lista de alarmes em formato de cartão */
+.alarme-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.alarme-vazio {
+  text-align: center;
+  padding: 14px 10px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.alarme-cartao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  transition: transform 0.12s ease, border-color 0.15s ease;
+}
+
+.alarme-cartao:hover {
+  border-color: #a78bfa;
+}
+
+.alarme-cartao-hora {
+  font-size: 15px;
+  font-weight: 700;
+  color: #6d28d9;
+  line-height: 1.1;
+}
+
+.alarme-cartao-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.alarme-cartao-titulo {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.alarme-cartao-meta {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.alarme-btn-remover {
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 5px 7px;
+  border-radius: 8px;
+  font-size: 13px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.alarme-btn-remover:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Formulário */
+.alarme-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.alarme-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.alarme-campo label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.alarme-dica {
+  font-weight: 400;
+  color: #64748b;
+}
+
+.alarme-linha-2col {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 8px;
+}
+
+.alarme-form input[type="text"],
+.alarme-form input[type="date"],
+.alarme-form input[type="time"],
+.alarme-form select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 7px 10px;
+  border-radius: 9px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.alarme-form input:focus,
+.alarme-form select:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.14);
+}
+
+.alarme-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.alarme-chip-acao {
+  border: 1px solid #ddd6fe;
+  background: #f5f3ff;
+  color: #6d28d9;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.alarme-chip-acao:hover {
+  background: #ede9fe;
+}
+
+.alarme-dias-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.alarme-dias-grid button {
+  padding: 6px 2px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.alarme-dias-grid button:hover {
+  border-color: #7c3aed;
+}
+
+.alarme-dias-grid button.ativo {
+  background: #7c3aed;
+  border-color: #7c3aed;
+  color: #ffffff;
+}
+
+.alarme-erro {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 11px;
+}
+
+.alarme-btn-guardar {
+  margin-top: 2px;
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  border-radius: 10px;
+  background: #7c3aed;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.alarme-btn-guardar:hover {
+  background: #6d28d9;
+}
