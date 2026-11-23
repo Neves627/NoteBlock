@@ -14,6 +14,8 @@ function createMenuWindow() {
   const win = new BrowserWindow({
     width: 300,
     height: 400,
+    minWidth: 360,
+    minHeight: 380,
     frame: false,
     alwaysOnTop: true,
     resizable: true,
@@ -63,10 +65,15 @@ function createNoteWindow(notaId) {
 }
 
 app.whenReady().then(() => {
+  app.setAppUserModelId('com.noteblock.app');
+
   createMenuWindow();
 
-  // Verifica atualizações automaticamente (apenas na versão compilada)
   if (app.isPackaged) {
+    // Abrir a app quando o Windows arranca (só na versão instalada)
+    app.setLoginItemSettings({ openAtLogin: true });
+
+    // Verifica atualizações automaticamente (apenas na versão compilada)
     autoUpdater.checkForUpdatesAndNotify();
   }
 });

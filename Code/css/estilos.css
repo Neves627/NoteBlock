@@ -1,5 +1,6 @@
 html, body {
   height: 100%;
+  scrollbar-width: none;
 }
 
 body {
@@ -12,6 +13,7 @@ body {
   font-family: sans-serif;
   position: relative;
   height: 100%;
+  box-sizing: border-box;
 }
 
 /* ============ Tema Escuro com Imagem ============ */
@@ -351,4 +353,52 @@ body.dark-theme #btnTema {
 body.dark-theme #btnTema,
 body.dark-theme #btnMinimizar {
   color: #f0f0f0;
+}
+
+/* Cor da caixa de fora no Dark Theme */
+html[data-theme="dark"] .caixa-criar-nota-externa,
+.dark .caixa-criar-nota-externa {
+  background-color: #242035 !important;
+  border-color: rgba(167, 139, 250, 0.3) !important;
+}
+#btnFundo {
+  position: absolute;
+  top: 4px;
+  right: 148px;
+  z-index: 10;
+}
+
+.painel-fundos {
+  position: absolute;
+  top: 40px;
+  right: 8px;
+  z-index: 40;
+  display: grid;
+  grid-template-columns: repeat(4, 40px);
+  gap: 8px;
+  padding: 10px;
+  max-height: calc(100% - 56px);
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  -webkit-app-region: no-drag;
+}
+
+.fundo-miniatura {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.fundo-miniatura.ativo {
+  outline: 3px solid #7c3aed;
+  outline-offset: 1px;
+}
+
+::-webkit-scrollbar {
+  display: none;
 }
