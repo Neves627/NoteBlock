@@ -1,6 +1,6 @@
 {
   "name": "code",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "description": "",
   "main": "main.js",
   "scripts": {
@@ -31,7 +31,7 @@
       }
     ],
     "win": {
-      "icon": "images/logo_mini.png",
+      "icon": "images/logo_mini2.jpg",
       "target": [
         "nsis",
         "portable"

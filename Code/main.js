@@ -1,5 +1,5 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
-const { autoUpdater } = require('electron-updater');
+const { app, BrowserWindow, ipcMain } = require('electron');
+const { configurarAtualizacoes } = require('./updater');
 const Store = require('electron-store');
 const path = require('path');
 
@@ -205,19 +205,8 @@ app.whenReady().then(() => {
 
   if (app.isPackaged) {
     app.setLoginItemSettings({ openAtLogin: true });
-    autoUpdater.checkForUpdatesAndNotify();
+    configurarAtualizacoes();
   }
-});
-
-autoUpdater.on('update-downloaded', () => {
-  dialog.showMessageBox({
-    type: 'info',
-    title: 'Atualização disponível',
-    message: 'Uma nova versão do NoteBlock foi descarregada. A aplicação vai reiniciar para atualizar.',
-    buttons: ['Reiniciar agora']
-  }).then(() => {
-    autoUpdater.quitAndInstall();
-  });
 });
 
 ipcMain.on('fechar-janela', (event) => {
