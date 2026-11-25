@@ -665,3 +665,8 @@ html[data-theme="dark"] .caixa-criar-nota-externa,
 input, button {
   -webkit-app-region: no-drag;
 }
+
+body.dark-theme .badge-alarme-nota,
+body.dark-theme .badge-alarme-nota i {
+  color: #fcd34d;
+}
