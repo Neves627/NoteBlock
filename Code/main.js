@@ -106,6 +106,10 @@ function createNoteWindow(notaId) {
 
   const tamanhosNotas = store.get('tamanhosNotas', {});
   const posicoesNotas = store.get('posicoesNotas', {});
+  const listaNotas = store.get('listaNotas', []);
+  const notaInfo = listaNotas.find((n) => n.id === notaId);
+  const estaAfixada = Boolean(notaInfo && notaInfo.afixada);
+
   const tamanhoGuardado = tamanhosNotas[notaId] || { width: 300, height: 350 };
   const posicaoGuardada = posicoesNotas[notaId];
   const temPosicao =
@@ -117,7 +121,7 @@ function createNoteWindow(notaId) {
     width: tamanhoGuardado.width,
     height: tamanhoGuardado.height,
     frame: false,
-    alwaysOnTop: false,
+    alwaysOnTop: estaAfixada,
     resizable: true,
     show: false,
     icon: iconPath,
@@ -134,6 +138,7 @@ function createNoteWindow(notaId) {
 
   const win = new BrowserWindow(opcoesJanela);
   win.notaId = notaId;
+  win.setAlwaysOnTop(estaAfixada);
   janelasNotas.set(notaId, win);
   adicionarNotaAberta(notaId);
 
@@ -233,4 +238,11 @@ ipcMain.on('fechar-nota-id', (event, notaId) => {
       win.close();
     }
   });
+});
+
+ipcMain.on('definir-sempre-no-topo-nota', (event, { notaId, estado }) => {
+  const win = janelasNotas.get(notaId) || BrowserWindow.fromWebContents(event.sender);
+  if (win && !win.isDestroyed()) {
+    win.setAlwaysOnTop(Boolean(estado));
+  }
 });

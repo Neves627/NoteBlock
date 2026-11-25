@@ -14,10 +14,41 @@ if (!notaAtual) {
 }
 
 const btnFechar = document.getElementById('btnFechar');
+const btnPin = document.getElementById('btnPin');
 const tituloNotaInput = document.getElementById('tituloNotaInput');
 const texto = document.getElementById('texto');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+
+let notaAfixada = Boolean(notaAtual.afixada);
+
+function atualizarEstadoPin() {
+  if (!btnPin) return;
+  btnPin.classList.toggle('ativo', notaAfixada);
+  btnPin.title = notaAfixada ? 'Desafixar do topo' : 'Afixar no topo';
+  btnPin.setAttribute('aria-pressed', String(notaAfixada));
+}
+
+if (window.notaAPI && typeof window.notaAPI.definirSempreNoTopoNota === 'function') {
+  window.notaAPI.definirSempreNoTopoNota(notaId, notaAfixada);
+}
+atualizarEstadoPin();
+
+if (btnPin) {
+  btnPin.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    notaAfixada = !notaAfixada;
+    notaAtual.afixada = notaAfixada;
+    atualizarEstadoPin();
+
+    if (window.notaAPI && typeof window.notaAPI.definirSempreNoTopoNota === 'function') {
+      window.notaAPI.definirSempreNoTopoNota(notaId, notaAfixada);
+    }
+
+    guardarNota();
+  });
+}
 
 // Fecho da nota
 if (btnFechar) {
@@ -50,6 +81,7 @@ function guardarNota() {
   notaAtual.titulo = tituloNotaInput.value;
   notaAtual.conteudo = texto.innerHTML;
   notaAtual.desenho = canvas.toDataURL();
+  notaAtual.afixada = notaAfixada;
   if (typeof fundoAtualId !== 'undefined') {
     notaAtual.fundo = fundoAtualId;
   }
@@ -253,7 +285,6 @@ let diasSelecionados = [];
 const seletorData = flatpickr('#alarmeData', {
   dateFormat: 'Y-m-d',
   onChange: () => {
-    // Se escolher uma data específica, limpa os dias da semana para não confundir
     if (alarmeData.value) {
       diasSelecionados = [];
       diasSemana.querySelectorAll('button').forEach(b => b.classList.remove('ativo'));
@@ -276,14 +307,12 @@ btnFecharPainel.addEventListener('click', () => {
   painelAlarme.style.display = 'none';
 });
 
-// Fechar ao clicar fora do modal
 painelAlarme.addEventListener('click', (e) => {
   if (e.target === painelAlarme) {
     painelAlarme.style.display = 'none';
   }
 });
 
-// Atalho Seg–Sex
 if (btnDiasUteis) {
   btnDiasUteis.addEventListener('click', () => {
     const diasUteis = [1, 2, 3, 4, 5];
@@ -304,7 +333,6 @@ if (btnDiasUteis) {
   });
 }
 
-// Seleção individual de dias da semana
 diasSemana.querySelectorAll('button').forEach((btn) => {
   btn.addEventListener('click', () => {
     const dia = parseInt(btn.dataset.dia, 10);
@@ -314,7 +342,6 @@ diasSemana.querySelectorAll('button').forEach((btn) => {
     } else {
       diasSelecionados.push(dia);
       btn.classList.add('ativo');
-      // Limpa a data específica se o utilizador escolheu dias recorrentes
       seletorData.clear();
     }
   });
@@ -401,7 +428,6 @@ btnGuardarAlarme.addEventListener('click', () => {
   guardarNota();
   renderizarListaAlarmes();
 
-  // Limpar formulário
   alarmeTitulo.value = '';
   diasSelecionados = [];
   diasSemana.querySelectorAll('button').forEach(b => b.classList.remove('ativo'));

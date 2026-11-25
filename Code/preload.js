@@ -1,8 +1,8 @@
 const { contextBridge, ipcRenderer } = require('electron');
 const Store = require('electron-store');
- 
+
 const store = new Store();
- 
+
 contextBridge.exposeInMainWorld('notaAPI', {
   carregarNotas: () => store.get('listaNotas', []),
   guardarNotas: (notas) => store.set('listaNotas', notas),
@@ -11,4 +11,6 @@ contextBridge.exposeInMainWorld('notaAPI', {
   fecharNotaPorId: (notaId) => ipcRenderer.send('fechar-nota-id', notaId),
   fecharJanela: () => ipcRenderer.send('fechar-janela'),
   minimizarJanela: () => ipcRenderer.send('minimizar-janela'),
+  definirSempreNoTopoNota: (notaId, estado) =>
+    ipcRenderer.send('definir-sempre-no-topo-nota', { notaId, estado }),
 });

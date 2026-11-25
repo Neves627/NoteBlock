@@ -670,3 +670,22 @@ body.dark-theme .badge-alarme-nota,
 body.dark-theme .badge-alarme-nota i {
   color: #fcd34d;
 }
+
+#btnPin {
+  position: absolute;
+  top: 4px;
+  right: 184px;
+  z-index: 10;
+  border-radius: 6px;
+  padding: 2px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+#btnPin.ativo {
+  background-color: rgba(124, 58, 237, 0.18);
+  color: #7c3aed;
+}
+
+#btnPin.ativo svg {
+  fill: currentColor;
+}
