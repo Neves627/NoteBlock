@@ -21,6 +21,9 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
 let notaAfixada = Boolean(notaAtual.afixada);
+if (!Array.isArray(notaAtual.checklist)) {
+  notaAtual.checklist = [];
+}
 
 function atualizarEstadoPin() {
   if (!btnPin) return;
@@ -82,6 +85,7 @@ function guardarNota() {
   notaAtual.conteudo = texto.innerHTML;
   notaAtual.desenho = canvas.toDataURL();
   notaAtual.afixada = notaAfixada;
+  notaAtual.checklist = Array.isArray(notaAtual.checklist) ? notaAtual.checklist : [];
   if (typeof fundoAtualId !== 'undefined') {
     notaAtual.fundo = fundoAtualId;
   }
@@ -505,3 +509,113 @@ function verificarAlarmesNota() {
   });
 }
 setInterval(verificarAlarmesNota, 15000);
+
+// ============================================
+// PAINEL LATERAL DE CHECKLIST
+// ============================================
+const btnGavetaChecklist = document.getElementById('btnGavetaChecklist');
+const painelChecklist = document.getElementById('painelChecklist');
+const btnFecharChecklist = document.getElementById('btnFecharChecklist');
+const inputNovaTarefa = document.getElementById('inputNovaTarefa');
+const btnAdicionarTarefa = document.getElementById('btnAdicionarTarefa');
+const listaChecklist = document.getElementById('listaChecklist');
+const resumoChecklist = document.getElementById('resumoChecklist');
+const contadorChecklist = document.getElementById('contadorChecklist');
+
+function atualizarResumoChecklist() {
+  const total = notaAtual.checklist.length;
+  const concluidas = notaAtual.checklist.filter((item) => item.feita).length;
+  if (resumoChecklist) resumoChecklist.textContent = `${concluidas} de ${total} concluídas`;
+  if (contadorChecklist) contadorChecklist.textContent = String(total - concluidas);
+}
+
+function renderizarChecklist() {
+  if (!listaChecklist) return;
+  listaChecklist.innerHTML = '';
+
+  if (notaAtual.checklist.length === 0) {
+    listaChecklist.innerHTML = '<small style="text-align:center;opacity:0.7;padding:12px 0;">Sem tarefas nesta nota.</small>';
+    atualizarResumoChecklist();
+    return;
+  }
+
+  notaAtual.checklist.forEach((item) => {
+    const linha = document.createElement('div');
+    linha.className = `item-checklist${item.feita ? ' concluida' : ''}`;
+
+    const label = document.createElement('label');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = Boolean(item.feita);
+    checkbox.addEventListener('change', () => {
+      item.feita = checkbox.checked;
+      linha.classList.toggle('concluida', item.feita);
+      atualizarResumoChecklist();
+      guardarNota();
+    });
+
+    const span = document.createElement('span');
+    span.textContent = item.texto;
+
+    label.appendChild(checkbox);
+    label.appendChild(span);
+
+    const btnRemover = document.createElement('button');
+    btnRemover.type = 'button';
+    btnRemover.className = 'outline secondary';
+    btnRemover.style.cssText = 'padding:0.1rem 0.35rem;margin:0;width:auto;font-size:0.7rem;border:none;';
+    btnRemover.textContent = '✕';
+    btnRemover.addEventListener('click', () => {
+      notaAtual.checklist = notaAtual.checklist.filter((t) => t.id !== item.id);
+      renderizarChecklist();
+      guardarNota();
+    });
+
+    linha.appendChild(label);
+    linha.appendChild(btnRemover);
+    listaChecklist.appendChild(linha);
+  });
+
+  atualizarResumoChecklist();
+}
+
+function adicionarTarefaChecklist() {
+  if (!inputNovaTarefa) return;
+  const textoTarefa = inputNovaTarefa.value.trim();
+  if (!textoTarefa) return;
+
+  notaAtual.checklist.push({ id: Date.now(), texto: textoTarefa, feita: false });
+  inputNovaTarefa.value = '';
+  renderizarChecklist();
+  guardarNota();
+  inputNovaTarefa.focus();
+}
+
+if (btnGavetaChecklist && painelChecklist) {
+  btnGavetaChecklist.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const vaiAbrir = !painelChecklist.classList.contains('aberta');
+    painelChecklist.classList.toggle('aberta', vaiAbrir);
+    painelChecklist.setAttribute('aria-hidden', String(!vaiAbrir));
+    if (vaiAbrir && inputNovaTarefa) setTimeout(() => inputNovaTarefa.focus(), 50);
+  });
+}
+
+if (btnFecharChecklist && painelChecklist) {
+  btnFecharChecklist.addEventListener('click', () => {
+    painelChecklist.classList.remove('aberta');
+    painelChecklist.setAttribute('aria-hidden', 'true');
+  });
+}
+
+if (btnAdicionarTarefa) btnAdicionarTarefa.addEventListener('click', adicionarTarefaChecklist);
+if (inputNovaTarefa) {
+  inputNovaTarefa.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      adicionarTarefaChecklist();
+    }
+  });
+}
+
+renderizarChecklist();

@@ -22,6 +22,14 @@ function limparTimerNota(notaId) {
   }
 }
 
+const LARGURA_CHECKLIST = 260;
+const checklistsAbertas = new Set();
+
+function obterLarguraBaseNota(notaId, win) {
+  const [width] = win.getSize();
+  return checklistsAbertas.has(notaId) ? Math.max(300, width - LARGURA_CHECKLIST) : width;
+}
+
 function guardarLimitesNota(notaId, win) {
   limparTimerNota(notaId);
   if (!win || win.isDestroyed()) return;

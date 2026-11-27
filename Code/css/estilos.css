@@ -689,3 +689,56 @@ body.dark-theme .badge-alarme-nota i {
 #btnPin.ativo svg {
   fill: currentColor;
 }
+
+/* Barrinha e gaveta de checklist (estilos visuais tratados pelo Pico CSS) */
+#btnGavetaChecklist {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: auto;
+  margin: 0;
+  padding: 14px 6px;
+  border-radius: 10px 0 0 10px;
+  font-size: 11px;
+  z-index: 35;
+  -webkit-app-region: no-drag;
+}
+
+.gaveta-checklist {
+  position: fixed;
+  top: 34px;
+  right: 22px;
+  bottom: 10px;
+  width: min(260px, calc(100% - 32px));
+  margin: 0;
+  padding: 0.75rem;
+  display: none;
+  flex-direction: column;
+  z-index: 34;
+  -webkit-app-region: no-drag;
+}
+
+.gaveta-checklist.aberta {
+  display: flex;
+}
+
+.item-checklist {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 0.78rem;
+}
+
+.item-checklist label {
+  margin: 0;
+  flex: 1;
+  cursor: pointer;
+}
+
+.item-checklist.concluida span {
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+

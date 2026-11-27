@@ -13,4 +13,6 @@ contextBridge.exposeInMainWorld('notaAPI', {
   minimizarJanela: () => ipcRenderer.send('minimizar-janela'),
   definirSempreNoTopoNota: (notaId, estado) =>
     ipcRenderer.send('definir-sempre-no-topo-nota', { notaId, estado }),
+  definirLarguraChecklistNota: (notaId, aberta) =>
+  ipcRenderer.send('definir-largura-checklist-nota', { notaId, aberta }),
 });

@@ -4,6 +4,7 @@
   <title>Nota</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <link rel="stylesheet" href="css/estilos.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
 </head>
@@ -140,6 +141,29 @@
     </div>
   </div>
 
+  <div class="pico" data-theme="light">
+    <button id="btnGavetaChecklist" type="button" title="Checklist da nota" aria-label="Checklist da nota">
+      <span id="contadorChecklist">0</span>
+    </button>
+
+    <article id="painelChecklist" class="gaveta-checklist" aria-hidden="true">
+      <header style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;padding:0.5rem 0.75rem;">
+        <div>
+          <strong style="font-size:0.85rem;display:block;">Checklist</strong>
+          <small id="resumoChecklist" style="font-size:0.7rem;">0 de 0 concluídas</small>
+        </div>
+        <button id="btnFecharChecklist" type="button" class="outline secondary" style="padding:0.2rem 0.45rem;margin:0;width:auto;font-size:0.75rem;">✕</button>
+      </header>
+
+      <fieldset role="group" style="margin-bottom:0.6rem;">
+        <input type="text" id="inputNovaTarefa" placeholder="Nova tarefa..." autocomplete="off" style="font-size:0.78rem;height:2.1rem;">
+        <button id="btnAdicionarTarefa" type="button" style="padding:0 0.7rem;height:2.1rem;font-size:0.9rem;">+</button>
+      </fieldset>
+
+      <div id="listaChecklist" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:0.35rem;"></div>
+    </article>
+  </div>
+  
   <audio id="somAlarme" preload="auto"></audio>
 
   <script src="js/nota-janela.js"></script>
